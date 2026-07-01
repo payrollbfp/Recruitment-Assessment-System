@@ -356,6 +356,9 @@ async function init(){
 
     const token=getToken();
 
+    console.log("TOKEN =", token);
+    
+
     if(!token){
 
         showError("Link assessment tidak valid.");
@@ -404,7 +407,7 @@ async function loadEvent(token){
 
     .eq("token",token)
 
-    .single();
+    .maybeSingle();
 
     if(error){
 
@@ -417,6 +420,8 @@ async function loadEvent(token){
     }
 
     currentEvent=data;
+
+    console.log(data);
 
     document
     .getElementById("loading")

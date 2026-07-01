@@ -1,7 +1,7 @@
-/* =====================================================
+/* ============================================
    Recruitment Assessment System
-   File : candidate_login.js
-===================================================== */
+   candidate_login.js
+============================================ */
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -13,124 +13,164 @@ async function init() {
 
     if (!token) {
 
-        showError("Link assessment tidak valid.");
+        showMessage("Link assessment tidak valid.");
 
-        disableForm();
+        disableLogin();
 
         return;
 
     }
 
-    currentEvent = await getEventByToken(token);
+    currentEvent = await loadEvent(token);
 
     if (!currentEvent) {
 
-        showError("Assessment tidak ditemukan.");
+        showMessage("Assessment tidak ditemukan.");
 
-        disableForm();
+        disableLogin();
 
         return;
 
     }
 
-    document.getElementById("companyName").textContent =
-        currentEvent.company_name || "Recruitment Assessment";
-
-    document.getElementById("eventName").textContent =
+    document.getElementById("eventName").innerText =
         currentEvent.event_name;
 
-    document.getElementById("eventPeriod").textContent =
-        formatDate(currentEvent.start_date) +
-        " - " +
-        formatDate(currentEvent.end_date);
+    document.getElementById("eventPeriod").innerText =
+        "Status : " + currentEvent.status;
 
     document
         .getElementById("loginForm")
-        .addEventListener("submit", loginCandidate);
+        .addEventListener("submit", login);
 
 }
 
-async function loginCandidate(e) {
+async function loadEvent(token){
+
+    const { data, error } = await supabaseClient
+
+        .from("recruitment_events")
+
+        .select("*")
+
+        .eq("token", token)
+
+        .eq("status","Aktif")
+
+        .single();
+
+    if(error){
+
+        console.error(error);
+
+        return null;
+
+    }
+
+    return data;
+
+}
+
+async function login(e){
 
     e.preventDefault();
 
-    const phone = document
+    const phone =
+        document
         .getElementById("phone")
         .value
         .trim();
 
-    if (phone === "") {
+    if(phone==""){
 
-        showError("Nomor HP harus diisi.");
+        showMessage("Nomor HP harus diisi.");
 
         return;
 
     }
 
-    const button = document.getElementById("btnLogin");
+    const btn =
+        document.getElementById("btnLogin");
 
-    setButtonLoading(button);
+    setButtonLoading(btn);
 
-    try {
+    const { data, error } = await supabaseClient
 
-        const candidate = await getCandidate(
-            phone,
+        .from("candidates")
+
+        .select("*")
+
+        .eq("event_id",currentEvent.id)
+
+        .eq("phone",phone)
+
+        .maybeSingle();
+
+    resetButton(btn);
+
+    if(error){
+
+        console.error(error);
+
+        showMessage("Terjadi kesalahan.");
+
+        return;
+
+    }
+
+    if(data){
+
+        SESSION.save({
+
+            id:data.id,
+
+            candidate_code:data.candidate_code,
+
+            event_id:data.event_id,
+
+            phone:data.phone
+
+        });
+
+        window.location.href =
+        "dashboard.html?token=" +
+        getToken();
+
+    }else{
+
+        sessionStorage.setItem(
+            "phone",
+            phone
+        );
+
+        sessionStorage.setItem(
+            "event_id",
             currentEvent.id
         );
 
-        if (candidate) {
-
-            SESSION.save({
-
-                candidate_id: candidate.id,
-
-                candidate_code: candidate.candidate_code,
-
-                event_id: currentEvent.id,
-
-                phone: phone
-
-            });
-
-            window.location.href =
-                "dashboard.html?token=" +
-                getToken();
-
-        } else {
-
-            sessionStorage.setItem(
-                "new_phone",
-                phone
-            );
-
-            window.location.href =
-                "biodata.html?token=" +
-                getToken();
-
-        }
-
-    } catch (err) {
-
-        console.error(err);
-
-        showError("Terjadi kesalahan.");
-
-        resetButton(button);
+        window.location.href =
+        "biodata.html?token=" +
+        getToken();
 
     }
 
 }
 
-function showError(text) {
+function showMessage(text){
 
-    document.getElementById("message").innerHTML = text;
+    document.getElementById("message")
+    .innerHTML = text;
 
 }
 
-function disableForm() {
+function disableLogin(){
 
-    document.getElementById("phone").disabled = true;
+    document
+        .getElementById("phone")
+        .disabled=true;
 
-    document.getElementById("btnLogin").disabled = true;
+    document
+        .getElementById("btnLogin")
+        .disabled=true;
 
 }

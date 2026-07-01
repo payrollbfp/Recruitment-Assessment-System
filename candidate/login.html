@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recruitment Assessment</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+
+    background:#f3f6fb;
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+
+}
+
+.container{
+
+    width:100%;
+
+    max-width:420px;
+
+}
+
+.card{
+
+    background:#ffffff;
+
+    border-radius:12px;
+
+    padding:30px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.title{
+
+    font-size:26px;
+
+    font-weight:bold;
+
+    color:#1E3A8A;
+
+    text-align:center;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-top:8px;
+
+    margin-bottom:25px;
+
+}
+
+.event-box{
+
+    background:#F5F7FA;
+
+    border-radius:8px;
+
+    padding:15px;
+
+    margin-bottom:25px;
+
+}
+
+.event-name{
+
+    text-align:center;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    color:#222;
+
+}
+
+.event-status{
+
+    text-align:center;
+
+    color:#777;
+
+    margin-top:8px;
+
+}
+
+.form-group{
+
+    margin-bottom:20px;
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+}
+
+input{
+
+    width:100%;
+
+    height:48px;
+
+    border:1px solid #D8DCE6;
+
+    border-radius:8px;
+
+    padding:0 15px;
+
+    font-size:16px;
+
+}
+
+input:focus{
+
+    outline:none;
+
+    border-color:#2563EB;
+
+}
+
+button{
+
+    width:100%;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#2563EB;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    background:#1D4ED8;
+
+}
+
+button:disabled{
+
+    background:#AAB6CF;
+
+}
+
+.message{
+
+    margin-top:15px;
+
+    color:#DC2626;
+
+    text-align:center;
+
+    min-height:20px;
+
+}
+
+.footer{
+
+    margin-top:30px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:#777;
+
+    line-height:20px;
+
+}
+
+.loading{
+
+    text-align:center;
+
+    padding:30px;
+
+    color:#666;
+
+}
+
+</style>
+
+</head>
+
+  <body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="title">
+            Recruitment Assessment
+        </div>
+
+        <div class="subtitle">
+            PT Bintang Fajar Persada
+        </div>
+
+        <div
+            id="loading"
+            class="loading">
+
+            Memuat data assessment...
+
+        </div>
+
+        <div
+            id="content"
+            style="display:none;">
+
+            <div class="event-box">
+
+                <div
+                    id="eventName"
+                    class="event-name">
+
+                    -
+
+                </div>
+
+                <div
+                    id="eventStatus"
+                    class="event-status">
+
+                    -
+
+                </div>
+
+            </div>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label>
+
+                        Nomor HP
+
+                    </label>
+
+                    <input
+
+                        type="text"
+
+                        id="phone"
+
+                        placeholder="08xxxxxxxxxx"
+
+                        autocomplete="off"
+
+                        required>
+
+                </div>
+
+                <button
+                    type="submit"
+                    id="btnLogin">
+
+                    LANJUT
+
+                </button>
+
+            </form>
+
+            <div
+                id="message"
+                class="message">
+
+            </div>
+
+        </div>
+
+        <div class="footer">
+
+            Dengan melanjutkan Anda menyetujui proses assessment
+            yang diselenggarakan perusahaan.
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let currentEvent = null;
+
+  // =========================================
+// START
+// =========================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);
+
+async function init(){
+
+    const token=getToken();
+
+    if(!token){
+
+        showError("Link assessment tidak valid.");
+
+        return;
+
+    }
+
+    await loadEvent(token);
+
+    document
+    .getElementById("loginForm")
+    .addEventListener(
+        "submit",
+        loginCandidate
+    );
+
+}
+
+// =========================================
+// TOKEN
+// =========================================
+
+function getToken(){
+
+    const params=
+    new URLSearchParams(
+        window.location.search
+    );
+
+    return params.get("token");
+
+}
+
+// =========================================
+// LOAD EVENT
+// =========================================
+
+async function loadEvent(token){
+
+    const {data,error}=await supabaseClient
+
+    .from("recruitment_events")
+
+    .select("*")
+
+    .eq("token",token)
+
+    .single();
+
+    if(error){
+
+        console.error(error);
+
+        showError("Assessment tidak ditemukan.");
+
+        return;
+
+    }
+
+    currentEvent=data;
+
+    document
+    .getElementById("loading")
+    .style.display="none";
+
+    document
+    .getElementById("content")
+    .style.display="block";
+
+    document
+    .getElementById("eventName")
+    .innerHTML=data.event_name;
+
+    document
+    .getElementById("eventStatus")
+    .innerHTML=
+    "Status : "+data.status;
+
+}
+
+// =========================================
+// LOGIN
+// =========================================
+
+async function loginCandidate(e){
+
+    e.preventDefault();
+
+    const phone=document
+
+    .getElementById("phone")
+
+    .value
+
+    .trim();
+
+    if(phone==""){
+
+        showError("Nomor HP harus diisi.");
+
+        return;
+
+    }
+
+    const btn=
+    document.getElementById("btnLogin");
+
+    btn.disabled=true;
+
+    btn.innerHTML="Mohon Tunggu...";
+
+    const {data,error}=await supabaseClient
+
+    .from("candidates")
+
+    .select("*")
+
+    .eq("event_id",currentEvent.id)
+
+    .eq("phone",phone)
+
+    .maybeSingle();
+
+    btn.disabled=false;
+
+    btn.innerHTML="LANJUT";
+
+    if(error){
+
+        console.error(error);
+
+        showError("Terjadi kesalahan.");
+
+        return;
+
+    }
+
+    if(data){
+
+        sessionStorage.setItem(
+            "candidate",
+            JSON.stringify(data)
+        );
+
+        window.location.href=
+        "dashboard.html?token="+
+        getToken();
+
+    }
+
+    else{
+
+        sessionStorage.setItem(
+            "phone",
+            phone
+        );
+
+        sessionStorage.setItem(
+            "event_id",
+            currentEvent.id
+        );
+
+        window.location.href=
+        "biodata.html?token="+
+        getToken();
+
+    }
+
+}
+
+// =========================================
+// MESSAGE
+// =========================================
+
+function showError(text){
+
+    document
+    .getElementById("loading")
+    .style.display="none";
+
+    document
+    .getElementById("message")
+    .innerHTML=text;
+
+}
+
+</script>
+
+</body>
+
+</html>
+
+  

@@ -409,11 +409,9 @@ supabase.createClient(
     SUPABASE_KEY
 );
 
-let phone = "";
+let currentEvent = null;
 
-let eventId = "";
-
-let candidate = null;
+let currentPosition = null;
 
 
 //==================================================
@@ -592,21 +590,6 @@ async function saveCandidate(e){
         status:"Belum Mulai"
 
     };
-    //==========================================
-    // VALIDASI
-    //==========================================
-
-    if(payload.position_id==""){
-
-        alert("Silakan pilih posisi yang dilamar.");
-
-        btn.disabled=false;
-
-        btn.innerHTML="SIMPAN BIODATA";
-
-        return;
-
-    }
 
     //==========================================
     // INSERT CANDIDATE

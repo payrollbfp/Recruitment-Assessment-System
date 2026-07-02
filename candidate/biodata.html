@@ -351,9 +351,23 @@ required>
 
 <label>Posisi Dilamar</label>
 
-<select
-id="position_id"
-required>
+<div class="form-group">
+
+<label>
+
+Posisi Dilamar
+
+</label>
+
+<input
+
+type="text"
+
+id="position_name"
+
+readonly>
+
+</div>
 
 <option value="">
 
@@ -517,26 +531,24 @@ async function loadEvent(){
 // LOAD POSITION
 //==================================================
 
-async function loadPosition(){
-
-    const combo=
-    document.getElementById(
-        "position_id"
-    );
-
-    combo.innerHTML=
-    "<option value=''>Memuat Posisi...</option>";
+async function loadDefaultPosition()
 
     const {data,error}=await supabaseClient
 
-        .from("recruitment_event_positions")
+.from("recruitment_event_positions")
 
-        .select("*")
+.select("id,position_name")
 
-        .eq(
-            "event_id",
-            currentEvent.id
-        )
+.eq("event_id",currentEvent.id)
+
+.limit(1);
+      currentPosition=data[0];
+
+      document
+
+.getElementById("position_name")
+
+.value=currentPosition.position_name;
 
         .order("position_name");
 

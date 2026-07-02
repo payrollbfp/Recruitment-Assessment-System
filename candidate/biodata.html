@@ -382,6 +382,9 @@ async function init(){
 
     }
 
+    console.log("PHONE :", phone);
+console.log("EVENT :", eventId);
+
     await loadPosition();
 
     document
@@ -411,19 +414,16 @@ async function loadPosition(){
 
     if(error){
 
-        if(error){
-
-    alert(JSON.stringify(error));
+       if(error){
 
     console.error(error);
+
+    alert(JSON.stringify(error));
 
     return;
 
 }
 
-        return;
-
-    }
 
     const combo=document.getElementById("position_id");
 
@@ -529,8 +529,7 @@ async function saveCandidate(e){
         JSON.stringify(data)
     );
 
-    window.location.href=
-    "dashboard.html";
+   window.location.href="./dashboard.html";
 
 }
 

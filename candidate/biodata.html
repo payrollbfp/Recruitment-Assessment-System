@@ -411,7 +411,15 @@ async function loadPosition(){
 
     if(error){
 
-        console.error(error);
+        if(error){
+
+    alert(JSON.stringify(error));
+
+    console.error(error);
+
+    return;
+
+}
 
         return;
 

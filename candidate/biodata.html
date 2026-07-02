@@ -369,16 +369,6 @@ readonly>
 
 </div>
 
-<option value="">
-
-Memuat Posisi...
-
-</option>
-
-</select>
-
-</div>
-
 <button
 type="submit"
 id="btnSave">
@@ -524,60 +514,6 @@ async function loadEvent(){
     }
 
     currentEvent=data;
-
-}
-
-//==================================================
-// LOAD POSITION
-//==================================================
-
-async function loadDefaultPosition()
-
-    const {data,error}=await supabaseClient
-
-.from("recruitment_event_positions")
-
-.select("id,position_name")
-
-.eq("event_id",currentEvent.id)
-
-.limit(1);
-      currentPosition=data[0];
-
-      document
-
-.getElementById("position_name")
-
-.value=currentPosition.position_name;
-
-        .order("position_name");
-
-    if(error){
-
-        console.error(error);
-
-        alert(error.message);
-
-        return;
-
-    }
-
-    combo.innerHTML=
-    "<option value=''>Pilih Posisi</option>";
-
-    data.forEach(item=>{
-
-        combo.innerHTML+=`
-
-<option value="${item.id}">
-
-${item.position_name}
-
-</option>
-
-`;
-
-    });
 
 }
 

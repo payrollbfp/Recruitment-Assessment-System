@@ -5,7 +5,8 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>Recruitment Assessment - Biodata</title>
 
@@ -22,15 +23,15 @@
 
 body{
 
-    background:#F4F6F9;
+    background:#F3F6FB;
+
+    min-height:100vh;
 
     display:flex;
 
     justify-content:center;
 
     align-items:center;
-
-    min-height:100vh;
 
     padding:20px;
 
@@ -40,7 +41,7 @@ body{
 
     width:100%;
 
-    max-width:550px;
+    max-width:600px;
 
 }
 
@@ -74,7 +75,7 @@ body{
 
     color:#666;
 
-    margin-top:10px;
+    margin-top:8px;
 
     margin-bottom:30px;
 
@@ -90,9 +91,11 @@ label{
 
     display:block;
 
+    margin-bottom:8px;
+
     font-weight:600;
 
-    margin-bottom:8px;
+    color:#333;
 
 }
 
@@ -103,7 +106,7 @@ select{
 
     height:48px;
 
-    border:1px solid #D5D9E2;
+    border:1px solid #D8DCE6;
 
     border-radius:8px;
 
@@ -130,7 +133,7 @@ button{
 
     background:#2563EB;
 
-    color:white;
+    color:#FFF;
 
     border:none;
 
@@ -154,7 +157,7 @@ button:hover{
 
 button:disabled{
 
-    background:#9CA3AF;
+    background:#A7B4D1;
 
     cursor:not-allowed;
 
@@ -162,11 +165,11 @@ button:disabled{
 
 .message{
 
-    margin-top:15px;
-
     color:#DC2626;
 
     text-align:center;
+
+    margin-top:15px;
 
     min-height:22px;
 
@@ -174,13 +177,25 @@ button:disabled{
 
 .footer{
 
-    margin-top:30px;
+    margin-top:25px;
 
     text-align:center;
 
+    font-size:12px;
+
     color:#888;
 
-    font-size:12px;
+}
+
+.loading{
+
+    display:none;
+
+    text-align:center;
+
+    color:#2563EB;
+
+    margin-bottom:20px;
 
 }
 
@@ -202,7 +217,15 @@ Lengkapi Biodata
 
 <div class="subtitle">
 
-Silakan lengkapi data berikut sebelum memulai assessment.
+Silakan lengkapi data sebelum mengikuti assessment.
+
+</div>
+
+<div
+class="loading"
+id="loading">
+
+Memuat Data...
 
 </div>
 
@@ -234,13 +257,25 @@ required>
 
 <label>Jenis Kelamin</label>
 
-<select id="gender">
+<select id="gender" required>
 
-<option value="">Pilih</option>
+<option value="">
 
-<option value="Laki-laki">Laki-laki</option>
+Pilih Jenis Kelamin
 
-<option value="Perempuan">Perempuan</option>
+</option>
+
+<option value="Laki-laki">
+
+Laki-laki
+
+</option>
+
+<option value="Perempuan">
+
+Perempuan
+
+</option>
 
 </select>
 
@@ -252,7 +287,8 @@ required>
 
 <input
 type="date"
-id="birth_date">
+id="birth_date"
+required>
 
 </div>
 
@@ -260,9 +296,15 @@ id="birth_date">
 
 <label>Pendidikan Terakhir</label>
 
-<select id="education">
+<select
+id="education"
+required>
 
-<option value="">Pilih</option>
+<option value="">
+
+Pilih Pendidikan
+
+</option>
 
 <option>SMA / SMK</option>
 
@@ -300,7 +342,8 @@ id="major">
 
 <input
 type="text"
-id="domicile">
+id="domicile"
+required>
 
 </div>
 
@@ -308,9 +351,15 @@ id="domicile">
 
 <label>Posisi Dilamar</label>
 
-<select id="position_id">
+<select
+id="position_id"
+required>
 
-<option value="">Memuat Posisi...</option>
+<option value="">
+
+Memuat Posisi...
+
+</option>
 
 </select>
 
@@ -344,24 +393,38 @@ Recruitment Assessment System
 
 <script>
 
-const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
+const SUPABASE_URL =
+"https://nwrbjbwjmkahjuuyizfq.supabase.co";
 
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
 
-const supabaseClient=
+const supabaseClient =
 supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
+    SUPABASE_URL,
+    SUPABASE_KEY
 );
 
-let phone="";
-let eventId="";
+let phone = "";
 
-let candidateCode="";
+let eventId = "";
 
-  // ======================================
+let candidate = null;
+
+
+//==================================================
+// URL PARAMETER
+//==================================================
+
+const params=new URLSearchParams(window.location.search);
+
+const token=params.get("token");
+
+const phone=params.get("phone");
+
+//==================================================
 // INIT
-// ======================================
+//==================================================
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -370,11 +433,9 @@ document.addEventListener(
 
 async function init(){
 
-    phone=sessionStorage.getItem("phone");
+    if(!token){
 
-    eventId=sessionStorage.getItem("event_id");
-
-    if(!phone || !eventId){
+        alert("Token assessment tidak ditemukan.");
 
         window.location.href="login.html";
 
@@ -382,10 +443,28 @@ async function init(){
 
     }
 
-    console.log("PHONE :", phone);
-console.log("EVENT :", eventId);
+    if(!phone){
+
+        alert("Nomor HP tidak ditemukan.");
+
+        window.location.href=
+        "login.html?token="+token;
+
+        return;
+
+    }
+
+    document
+    .getElementById("loading")
+    .style.display="block";
+
+    await loadEvent();
 
     await loadPosition();
+
+    document
+    .getElementById("loading")
+    .style.display="none";
 
     document
     .getElementById("candidateForm")
@@ -396,59 +475,112 @@ console.log("EVENT :", eventId);
 
 }
 
-// ======================================
-// LOAD POSITION
-// ======================================
+//==================================================
+// LOAD EVENT
+//==================================================
 
-async function loadPosition(){
+async function loadEvent(){
 
     const {data,error}=await supabaseClient
 
-    .from("recruitment_event_positions")
+        .from("recruitment_events")
 
-    .select("*")
+        .select("*")
 
-    .eq("event_id",eventId)
+        .eq("token",token)
 
-    .order("position_name");
+        .maybeSingle();
 
     if(error){
 
-       if(error){
+        console.error(error);
 
-    console.error(error);
+        alert(error.message);
 
-    alert(JSON.stringify(error));
+        return;
 
-    return;
+    }
+
+    if(!data){
+
+        alert("Event recruitment tidak ditemukan.");
+
+        return;
+
+    }
+
+    currentEvent=data;
 
 }
 
+//==================================================
+// LOAD POSITION
+//==================================================
 
-    const combo=document.getElementById("position_id");
+async function loadPosition(){
 
-    combo.innerHTML='<option value="">Pilih Posisi</option>';
+    const combo=
+    document.getElementById(
+        "position_id"
+    );
+
+    combo.innerHTML=
+    "<option value=''>Memuat Posisi...</option>";
+
+    const {data,error}=await supabaseClient
+
+        .from("recruitment_event_positions")
+
+        .select("*")
+
+        .eq(
+            "event_id",
+            currentEvent.id
+        )
+
+        .order("position_name");
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    combo.innerHTML=
+    "<option value=''>Pilih Posisi</option>";
 
     data.forEach(item=>{
 
         combo.innerHTML+=`
-        <option value="${item.id}">
-            ${item.position_name}
-        </option>`;
+
+<option value="${item.id}">
+
+${item.position_name}
+
+</option>
+
+`;
 
     });
 
 }
 
-// ======================================
-// SAVE
-// ======================================
+//==================================================
+// SAVE CANDIDATE
+//==================================================
 
 async function saveCandidate(e){
 
     e.preventDefault();
 
-    const btn=document.getElementById("btnSave");
+    const btn=
+    document.getElementById(
+        "btnSave"
+    );
 
     btn.disabled=true;
 
@@ -456,82 +588,163 @@ async function saveCandidate(e){
 
     const payload={
 
-        event_id:eventId,
+        event_id:
+        currentEvent.id,
 
-        position_id:document.getElementById("position_id").value,
+        position_id:
+        document
+        .getElementById(
+            "position_id"
+        ).value,
 
         phone:phone,
 
-        full_name:document.getElementById("full_name").value.trim(),
+        full_name:
+        document
+        .getElementById(
+            "full_name"
+        ).value.trim(),
 
-        email:document.getElementById("email").value.trim(),
+        email:
+        document
+        .getElementById(
+            "email"
+        ).value.trim(),
 
-        gender:document.getElementById("gender").value,
+        gender:
+        document
+        .getElementById(
+            "gender"
+        ).value,
 
-        birth_date:document.getElementById("birth_date").value,
+        birth_date:
+        document
+        .getElementById(
+            "birth_date"
+        ).value,
 
-        education:document.getElementById("education").value,
+        education:
+        document
+        .getElementById(
+            "education"
+        ).value,
 
-        major:document.getElementById("major").value.trim(),
+        major:
+        document
+        .getElementById(
+            "major"
+        ).value.trim(),
 
-        domicile:document.getElementById("domicile").value.trim(),
+        domicile:
+        document
+        .getElementById(
+            "domicile"
+        ).value.trim(),
 
         status:"Belum Mulai"
 
     };
+    //==========================================
+    // VALIDASI
+    //==========================================
 
-    const {data,error}=await supabaseClient
+    if(payload.position_id==""){
 
-    .from("candidates")
-
-    .insert(payload)
-
-    .select()
-
-    .single();
-
-    if(error){
-
-        console.error(error);
+        alert("Silakan pilih posisi yang dilamar.");
 
         btn.disabled=false;
 
         btn.innerHTML="SIMPAN BIODATA";
 
-        document.getElementById("message").innerHTML=
-        error.message;
+        return;
+
+    }
+
+    //==========================================
+    // INSERT CANDIDATE
+    //==========================================
+
+    const {data,error}=await supabaseClient
+
+        .from("candidates")
+
+        .insert(payload)
+
+        .select()
+
+        .single();
+
+    if(error){
+
+        console.error(error);
+
+        document
+        .getElementById("message")
+        .innerHTML=error.message;
+
+        btn.disabled=false;
+
+        btn.innerHTML="SIMPAN BIODATA";
 
         return;
 
     }
 
-    const code=
-    "C-"+
-    data.id
-    .replace(/-/g,"")
-    .substring(0,6)
-    .toUpperCase();
+    //==========================================
+    // GENERATE CANDIDATE CODE
+    //==========================================
 
-    await supabaseClient
+    const candidateCode=
 
-    .from("candidates")
+        "C-"+
 
-    .update({
+        data.id
 
-        candidate_code:code
+        .replace(/-/g,"")
 
-    })
+        .substring(0,6)
 
-    .eq("id",data.id);
+        .toUpperCase();
 
-    sessionStorage.setItem(
-        "candidate",
-        JSON.stringify(data)
-    );
+    const {error:updateError}=await supabaseClient
 
-   window.location.href="./dashboard.html";
+        .from("candidates")
+
+        .update({
+
+            candidate_code:candidateCode
+
+        })
+
+        .eq("id",data.id);
+
+    if(updateError){
+
+        console.error(updateError);
+
+        alert(updateError.message);
+
+        btn.disabled=false;
+
+        btn.innerHTML="SIMPAN BIODATA";
+
+        return;
+
+    }
+
+    //==========================================
+    // REDIRECT
+    //==========================================
+
+    window.location.href=
+
+    "dashboard.html?id="+data.id;
 
 }
+
+//==========================================
+// END FILE
+//==========================================
 
 </script>
 

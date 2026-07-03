@@ -619,6 +619,8 @@ async function saveCandidate(e){
 
             candidate_code:candidateCode
 
+              console.log("Candidate :", data.id);
+
         })
 
         .eq("id",data.id);
@@ -641,7 +643,8 @@ async function saveCandidate(e){
     // REDIRECT
     //==========================================
 
-  alert("Biodata berhasil disimpan");
+window.location.href =
+`dashboard.html?id=${data.id}`;
 
 }
 

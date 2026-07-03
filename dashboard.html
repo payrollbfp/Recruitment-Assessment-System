@@ -523,20 +523,16 @@ async function loadCandidate(){
 
 function showCandidate(){
 
-    document
-    .getElementById("candidateName")
-    .innerHTML=
+    document.getElementById("candidateName").textContent =
     candidate.full_name;
 
-    document
-    .getElementById("candidatePhone")
-    .innerHTML=
+    document.getElementById("candidatePhone").textContent =
     candidate.phone;
 
-    document
-    .getElementById("candidateEmail")
-    .innerHTML=
+    document.getElementById("candidateEmail").textContent =
     candidate.email;
+
+    loadAssessmentStatus();
 
 }
 
@@ -547,8 +543,9 @@ function showCandidate(){
 
 function startAssessment(){
 
-    window.location.href=
-    "disc.html?id="+candidate.id;
+    function startAssessment(){
+
+    alert("Sprint 4 - DISC akan dibuat berikutnya");
 
 }
 

@@ -358,6 +358,8 @@ SIMPAN BIODATA
 
 </button>
 
+</div>
+
 <div
 id="message"
 class="message">
@@ -579,19 +581,19 @@ async function saveCandidate(e){
 
     if(error){
 
-        console.error(error);
+    console.error(error);
 
-        document
-        .getElementById("message")
-        .innerHTML=error.message;
+    alert(JSON.stringify(error));
 
-        btn.disabled=false;
+    document.getElementById("message").innerHTML=error.message;
 
-        btn.innerHTML="SIMPAN BIODATA";
+    btn.disabled=false;
 
-        return;
+    btn.innerHTML="SIMPAN BIODATA";
 
-    }
+    return;
+
+}
 
     //==========================================
     // GENERATE CANDIDATE CODE
@@ -639,9 +641,7 @@ async function saveCandidate(e){
     // REDIRECT
     //==========================================
 
-    window.location.href=
-
-    "dashboard.html?id="+data.id;
+  alert("Biodata berhasil disimpan");
 
 }
 

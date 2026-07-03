@@ -605,53 +605,20 @@ console.log("INSERT ERROR =", error);
     // GENERATE CANDIDATE CODE
     //==========================================
 
-    const candidateCode=
+   const candidateCode =
+"C-" +
+data.id.replace(/-/g,"")
+.substring(0,6)
+.toUpperCase();
 
-        "C-"+
-
-        data.id
-
-        .replace(/-/g,"")
-
-        .substring(0,6)
-
-        .toUpperCase();
-      
-const {error:updateError}=await supabaseClient
-
+const { error:updateError } = await supabaseClient
 .from("candidates")
-
 .update({
-
-    candidate_code:candidateCode
-
+    candidate_code: candidateCode
 })
-
-.eq("id",data.id);
+.eq("id", data.id);
 
 console.log("Candidate :", data.id);
-
-        })
-
-        .eq("id",data.id);
-
-    if(updateError){
-
-        console.error(updateError);
-
-        alert(updateError.message);
-
-        btn.disabled=false;
-
-        btn.innerHTML="SIMPAN BIODATA";
-
-        return;
-
-    }
-
-    //==========================================
-    // REDIRECT
-    //==========================================
 
 if(updateError){
 
@@ -667,7 +634,7 @@ if(updateError){
 
 }
 
-console.log("Redirect ke Dashboard...");
+console.log("Redirect Dashboard");
 
 window.location.href =
 "dashboard.html?id=" + data.id;

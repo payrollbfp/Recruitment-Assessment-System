@@ -524,13 +524,18 @@ async function loginCandidate(e){
             currentEvent.id
         );
 
-      window.location.href =
+     window.location.href =
 "biodata.html?token=" +
-token +
+getToken() +
 "&phone=" +
 phone;
 
+    }
+
 }
+
+// =========================================
+// MESSAGE
 
 // =========================================
 // MESSAGE

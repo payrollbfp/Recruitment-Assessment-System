@@ -465,6 +465,8 @@ async function init(){
 
     }
 
+
+
     document
     .getElementById("loading")
     .style.display="block";
@@ -475,6 +477,12 @@ async function init(){
     .getElementById("loading")
     .style.display="none";
 
+      document
+.getElementById("btnAssessment")
+.addEventListener(
+    "click",
+    startAssessment
+);
 }
 
 //==============================================
@@ -532,16 +540,6 @@ function showCandidate(){
 
 }
 
-  //==============================================
-// BUTTON EVENT
-//==============================================
-
-document
-.getElementById("btnAssessment")
-.addEventListener(
-    "click",
-    startAssessment
-);
 
 //==============================================
 // START ASSESSMENT
@@ -605,26 +603,6 @@ function loadAssessmentStatus(){
 // UPDATE DASHBOARD
 //==============================================
 
-function showCandidate(){
-
-    document
-    .getElementById("candidateName")
-    .innerHTML=
-    candidate.full_name;
-
-    document
-    .getElementById("candidatePhone")
-    .innerHTML=
-    candidate.phone;
-
-    document
-    .getElementById("candidateEmail")
-    .innerHTML=
-    candidate.email;
-
-    loadAssessmentStatus();
-
-}
 
 // loadAssessmentStatus();
 

@@ -569,7 +569,10 @@ async function saveCandidate(e){
     // INSERT CANDIDATE
     //==========================================
 
-    const {data,error}=await supabaseClient
+         console.log("PAYLOAD");
+      console.log(payload);
+      
+      const {data,error}=await supabaseClient
 
         .from("candidates")
 
@@ -578,6 +581,9 @@ async function saveCandidate(e){
         .select()
 
         .single();
+
+      console.log("INSERT DATA =", data);
+console.log("INSERT ERROR =", error);
 
     if(error){
 
@@ -610,8 +616,8 @@ async function saveCandidate(e){
         .substring(0,6)
 
         .toUpperCase();
-
-    const {error:updateError}=await supabaseClient
+      
+const {error:updateError}=await supabaseClient
 
 .from("candidates")
 

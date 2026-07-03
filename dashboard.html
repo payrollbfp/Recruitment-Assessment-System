@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Recruitment Assessment - Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+
+}
+
+body{
+
+background:#F3F6FB;
+
+min-height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+padding:20px;
+
+}
+
+.container{
+
+width:100%;
+max-width:600px;
+
+}
+
+.card{
+
+background:#FFFFFF;
+
+border-radius:14px;
+
+padding:30px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.title{
+
+font-size:28px;
+
+font-weight:bold;
+
+text-align:center;
+
+color:#1E3A8A;
+
+margin-bottom:10px;
+
+}
+
+.subtitle{
+
+text-align:center;
+
+color:#666;
+
+margin-bottom:30px;
+
+}
+
+.profile{
+
+background:#F8FAFC;
+
+border-radius:10px;
+
+padding:18px;
+
+margin-bottom:25px;
+
+}
+
+.profile h2{
+
+font-size:22px;
+
+color:#1E293B;
+
+margin-bottom:5px;
+
+}
+
+.profile p{
+
+color:#666;
+
+font-size:15px;
+
+margin-top:4px;
+
+}
+
+.section-title{
+
+font-size:18px;
+
+font-weight:bold;
+
+margin-bottom:15px;
+
+color:#1E293B;
+
+}
+
+.status-list{
+
+display:flex;
+
+flex-direction:column;
+
+gap:12px;
+
+margin-bottom:30px;
+
+}
+
+.status-item{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:14px 16px;
+
+border:1px solid #E5E7EB;
+
+border-radius:8px;
+
+background:#FAFAFA;
+
+}
+
+.status-name{
+
+font-weight:600;
+
+}
+
+.status-value{
+
+font-weight:bold;
+
+}
+
+.done{
+
+color:#16A34A;
+
+}
+
+.pending{
+
+color:#D97706;
+
+}
+
+button{
+
+width:100%;
+
+height:52px;
+
+background:#2563EB;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+font-size:17px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#1D4ED8;
+
+}
+
+.footer{
+
+margin-top:25px;
+
+text-align:center;
+
+font-size:12px;
+
+color:#888;
+
+}
+
+.loading{
+
+text-align:center;
+
+color:#2563EB;
+
+margin-bottom:20px;
+
+display:none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="title">
+
+Recruitment Assessment
+
+</div>
+
+<div class="subtitle">
+
+Dashboard Kandidat
+
+</div>
+
+<div
+id="loading"
+class="loading">
+
+Memuat Data...
+
+</div>
+
+<div class="profile">
+
+<h2 id="candidateName">
+
+Memuat...
+
+</h2>
+
+<p>
+
+Nomor HP :
+
+<span id="candidatePhone">
+
+-
+
+</span>
+
+</p>
+
+<p>
+
+Email :
+
+<span id="candidateEmail">
+
+-
+
+</span>
+
+</p>
+
+</div>
+
+<div class="section-title">
+
+Status Assessment
+
+</div>
+
+<div class="status-list">
+
+<div class="status-item">
+
+<div class="status-name">
+
+Biodata
+
+</div>
+
+<div
+class="status-value done">
+
+✔ Selesai
+
+</div>
+
+</div>
+
+<div class="status-item">
+
+<div class="status-name">
+
+DISC
+
+</div>
+
+<div
+id="discStatus"
+class="status-value pending">
+
+Belum Dimulai
+
+</div>
+
+</div>
+
+<div class="status-item">
+
+<div class="status-name">
+
+PAPI
+
+</div>
+
+<div
+id="papiStatus"
+class="status-value pending">
+
+Belum Dimulai
+
+</div>
+
+</div>
+
+<div class="status-item">
+
+<div class="status-name">
+
+Kraepelin
+
+</div>
+
+<div
+id="kraepelinStatus"
+class="status-value pending">
+
+Belum Dimulai
+
+</div>
+
+</div>
+
+<div class="status-item">
+
+<div class="status-name">
+
+Buta Warna
+
+</div>
+
+<div
+id="colorStatus"
+class="status-value pending">
+
+Belum Dimulai
+
+</div>
+
+</div>
+
+</div>
+
+<button
+id="btnAssessment">
+
+MULAI ASSESSMENT
+
+</button>
+
+<div class="footer">
+
+Recruitment Assessment System
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+//==============================================
+// SUPABASE
+//==============================================
+
+const SUPABASE_URL =
+"https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+//==============================================
+// URL PARAMETER
+//==============================================
+
+const params =
+new URLSearchParams(window.location.search);
+
+const candidateId =
+params.get("id");
+
+//==============================================
+// GLOBAL
+//==============================================
+
+let candidate = null;
+
+//==============================================
+// INIT
+//==============================================
+
+document.addEventListener(
+"DOMContentLoaded",
+init
+);
+
+async function init(){
+
+    if(!candidateId){
+
+        alert("Candidate tidak ditemukan.");
+
+        window.location.href="login.html";
+
+        return;
+
+    }
+
+    document
+    .getElementById("loading")
+    .style.display="block";
+
+    await loadCandidate();
+
+    document
+    .getElementById("loading")
+    .style.display="none";
+
+}
+
+//==============================================
+// LOAD CANDIDATE
+//==============================================
+
+async function loadCandidate(){
+
+    const {data,error}=await supabaseClient
+
+    .from("candidates")
+
+    .select("*")
+
+    .eq("id",candidateId)
+
+    .single();
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    candidate=data;
+
+    showCandidate();
+
+}
+
+//==============================================
+// TAMPILKAN DATA
+//==============================================
+
+function showCandidate(){
+
+    document
+    .getElementById("candidateName")
+    .innerHTML=
+    candidate.full_name;
+
+    document
+    .getElementById("candidatePhone")
+    .innerHTML=
+    candidate.phone;
+
+    document
+    .getElementById("candidateEmail")
+    .innerHTML=
+    candidate.email;
+
+}
+
+  //==============================================
+// BUTTON EVENT
+//==============================================
+
+document
+.getElementById("btnAssessment")
+.addEventListener(
+    "click",
+    startAssessment
+);
+
+//==============================================
+// START ASSESSMENT
+//==============================================
+
+function startAssessment(){
+
+    window.location.href=
+    "disc.html?id="+candidate.id;
+
+}
+
+//==============================================
+// LOAD STATUS
+//==============================================
+
+function loadAssessmentStatus(){
+
+    const status=
+    candidate.status || "Belum Mulai";
+
+    document
+    .getElementById("discStatus")
+    .innerHTML=
+    "Belum Dimulai";
+
+    document
+    .getElementById("papiStatus")
+    .innerHTML=
+    "Terkunci";
+
+    document
+    .getElementById("kraepelinStatus")
+    .innerHTML=
+    "Terkunci";
+
+    document
+    .getElementById("colorStatus")
+    .innerHTML=
+    "Terkunci";
+
+    if(status==="DISC Selesai"){
+
+        document
+        .getElementById("discStatus")
+        .innerHTML="Selesai";
+
+        document
+        .getElementById("papiStatus")
+        .innerHTML="Belum Dimulai";
+
+        document
+        .getElementById("btnAssessment")
+        .innerHTML="LANJUT PAPI";
+
+    }
+
+}
+
+//==============================================
+// UPDATE DASHBOARD
+//==============================================
+
+function showCandidate(){
+
+    document
+    .getElementById("candidateName")
+    .innerHTML=
+    candidate.full_name;
+
+    document
+    .getElementById("candidatePhone")
+    .innerHTML=
+    candidate.phone;
+
+    document
+    .getElementById("candidateEmail")
+    .innerHTML=
+    candidate.email;
+
+    loadAssessmentStatus();
+
+}
+
+// loadAssessmentStatus();
+
+
+//==============================================
+// END FILE
+//==============================================
+
+</script>
+
+</body>
+
+</html>

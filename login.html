@@ -506,9 +506,8 @@ async function loginCandidate(e){
             JSON.stringify(data)
         );
 
-        window.location.href=
-        "dashboard.html?token="+
-        getToken();
+        window.location.href =
+"dashboard.html?id=" + data.id;
 
     }
 

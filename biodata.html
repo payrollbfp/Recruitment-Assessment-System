@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Recruitment Assessment - Biodata</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+
+    background:#F3F6FB;
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+
+}
+
+.container{
+
+    width:100%;
+
+    max-width:600px;
+
+}
+
+.card{
+
+    background:#FFFFFF;
+
+    border-radius:12px;
+
+    padding:30px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+
+}
+
+.title{
+
+    text-align:center;
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:#1E3A8A;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-top:8px;
+
+    margin-bottom:30px;
+
+}
+
+.form-group{
+
+    margin-bottom:18px;
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#333;
+
+}
+
+input,
+select{
+
+    width:100%;
+
+    height:48px;
+
+    border:1px solid #D8DCE6;
+
+    border-radius:8px;
+
+    padding:0 15px;
+
+    font-size:15px;
+
+    outline:none;
+
+}
+
+input:focus,
+select:focus{
+
+    border-color:#2563EB;
+
+}
+
+button{
+
+    width:100%;
+
+    height:50px;
+
+    background:#2563EB;
+
+    color:#FFF;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin-top:10px;
+
+}
+
+button:hover{
+
+    background:#1D4ED8;
+
+}
+
+button:disabled{
+
+    background:#A7B4D1;
+
+    cursor:not-allowed;
+
+}
+
+.message{
+
+    color:#DC2626;
+
+    text-align:center;
+
+    margin-top:15px;
+
+    min-height:22px;
+
+}
+
+.footer{
+
+    margin-top:25px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:#888;
+
+}
+
+.loading{
+
+    display:none;
+
+    text-align:center;
+
+    color:#2563EB;
+
+    margin-bottom:20px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="title">
+
+Lengkapi Biodata
+
+</div>
+
+<div class="subtitle">
+
+Silakan lengkapi data sebelum mengikuti assessment.
+
+</div>
+
+<div
+class="loading"
+id="loading">
+
+Memuat Data...
+
+</div>
+
+<form id="candidateForm">
+
+<div class="form-group">
+
+<label>Nama Lengkap</label>
+
+<input
+type="text"
+id="full_name"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+type="email"
+id="email"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Jenis Kelamin</label>
+
+<select id="gender" required>
+
+<option value="">
+
+Pilih Jenis Kelamin
+
+</option>
+
+<option value="Laki-laki">
+
+Laki-laki
+
+</option>
+
+<option value="Perempuan">
+
+Perempuan
+
+</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Tanggal Lahir</label>
+
+<input
+type="date"
+id="birth_date"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Pendidikan Terakhir</label>
+
+<select
+id="education"
+required>
+
+<option value="">
+
+Pilih Pendidikan
+
+</option>
+
+<option>SMA / SMK</option>
+
+<option>D1</option>
+
+<option>D2</option>
+
+<option>D3</option>
+
+<option>D4</option>
+
+<option>S1</option>
+
+<option>S2</option>
+
+<option>S3</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Jurusan</label>
+
+<input
+type="text"
+id="major">
+
+</div>
+
+<div class="form-group">
+
+<label>Domisili</label>
+
+<input
+type="text"
+id="domicile"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Posisi Dilamar</label>
+
+<div class="form-group">
+
+<label>
+
+Posisi Dilamar
+
+</label>
+
+<input
+
+type="text"
+
+id="position_name"
+
+readonly>
+
+</div>
+
+<button
+type="submit"
+id="btnSave">
+
+SIMPAN BIODATA
+
+</button>
+
+<div
+id="message"
+class="message">
+
+</div>
+
+</form>
+
+<div class="footer">
+
+Recruitment Assessment System
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let phone = "";
+
+let eventId = "";
+
+let candidate = null;
+
+
+//==================================================
+// URL PARAMETER
+//==================================================
+
+const params=new URLSearchParams(window.location.search);
+
+const token=params.get("token");
+
+const phone=params.get("phone");
+
+//==================================================
+// INIT
+//==================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);
+
+async function init(){
+
+    if(!token){
+
+        alert("Token assessment tidak ditemukan.");
+
+        window.location.href="login.html";
+
+        return;
+
+    }
+
+    if(!phone){
+
+        alert("Nomor HP tidak ditemukan.");
+
+        window.location.href=
+        "login.html?token="+token;
+
+        return;
+
+    }
+
+    document
+    .getElementById("loading")
+    .style.display="block";
+
+    await loadEvent();
+
+    await loadPosition();
+
+    document
+    .getElementById("loading")
+    .style.display="none";
+
+    document
+    .getElementById("candidateForm")
+    .addEventListener(
+        "submit",
+        saveCandidate
+    );
+
+}
+
+//==================================================
+// LOAD EVENT
+//==================================================
+
+async function loadEvent(){
+
+    const {data,error}=await supabaseClient
+
+        .from("recruitment_events")
+
+        .select("*")
+
+        .eq("token",token)
+
+        .maybeSingle();
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    if(!data){
+
+        alert("Event recruitment tidak ditemukan.");
+
+        return;
+
+    }
+
+    currentEvent=data;
+
+}
+
+//==================================================
+// SAVE CANDIDATE
+//==================================================
+
+async function saveCandidate(e){
+
+    e.preventDefault();
+
+    const btn=
+    document.getElementById(
+        "btnSave"
+    );
+
+    btn.disabled=true;
+
+    btn.innerHTML="MENYIMPAN...";
+
+    const payload={
+
+        event_id:
+        currentEvent.id,
+
+        position_id:
+        document
+        .getElementById(
+            "position_id"
+        ).value,
+
+        phone:phone,
+
+        full_name:
+        document
+        .getElementById(
+            "full_name"
+        ).value.trim(),
+
+        email:
+        document
+        .getElementById(
+            "email"
+        ).value.trim(),
+
+        gender:
+        document
+        .getElementById(
+            "gender"
+        ).value,
+
+        birth_date:
+        document
+        .getElementById(
+            "birth_date"
+        ).value,
+
+        education:
+        document
+        .getElementById(
+            "education"
+        ).value,
+
+        major:
+        document
+        .getElementById(
+            "major"
+        ).value.trim(),
+
+        domicile:
+        document
+        .getElementById(
+            "domicile"
+        ).value.trim(),
+
+        status:"Belum Mulai"
+
+    };
+    //==========================================
+    // VALIDASI
+    //==========================================
+
+    if(payload.position_id==""){
+
+        alert("Silakan pilih posisi yang dilamar.");
+
+        btn.disabled=false;
+
+        btn.innerHTML="SIMPAN BIODATA";
+
+        return;
+
+    }
+
+    //==========================================
+    // INSERT CANDIDATE
+    //==========================================
+
+    const {data,error}=await supabaseClient
+
+        .from("candidates")
+
+        .insert(payload)
+
+        .select()
+
+        .single();
+
+    if(error){
+
+        console.error(error);
+
+        document
+        .getElementById("message")
+        .innerHTML=error.message;
+
+        btn.disabled=false;
+
+        btn.innerHTML="SIMPAN BIODATA";
+
+        return;
+
+    }
+
+    //==========================================
+    // GENERATE CANDIDATE CODE
+    //==========================================
+
+    const candidateCode=
+
+        "C-"+
+
+        data.id
+
+        .replace(/-/g,"")
+
+        .substring(0,6)
+
+        .toUpperCase();
+
+    const {error:updateError}=await supabaseClient
+
+        .from("candidates")
+
+        .update({
+
+            candidate_code:candidateCode
+
+        })
+
+        .eq("id",data.id);
+
+    if(updateError){
+
+        console.error(updateError);
+
+        alert(updateError.message);
+
+        btn.disabled=false;
+
+        btn.innerHTML="SIMPAN BIODATA";
+
+        return;
+
+    }
+
+    //==========================================
+    // REDIRECT
+    //==========================================
+
+    window.location.href=
+
+    "dashboard.html?id="+data.id;
+
+}
+
+//==========================================
+// END FILE
+//==========================================
+
+</script>
+
+</body>
+
+</html>

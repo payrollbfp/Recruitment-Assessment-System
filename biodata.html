@@ -349,25 +349,6 @@ required>
 
 <div class="form-group">
 
-<label>Posisi Dilamar</label>
-
-<div class="form-group">
-
-<label>
-
-Posisi Dilamar
-
-</label>
-
-<input
-
-type="text"
-
-id="position_name"
-
-readonly>
-
-</div>
 
 <button
 type="submit"
@@ -409,12 +390,9 @@ supabase.createClient(
     SUPABASE_KEY
 );
 
-let phone = "";
+let currentEvent = null;
 
-let eventId = "";
-
-let candidate = null;
-
+let currentPosition = null;
 
 //==================================================
 // URL PARAMETER
@@ -463,8 +441,6 @@ async function init(){
     .style.display="block";
 
     await loadEvent();
-
-    await loadPosition();
 
     document
     .getElementById("loading")
@@ -539,12 +515,6 @@ async function saveCandidate(e){
         event_id:
         currentEvent.id,
 
-        position_id:
-        document
-        .getElementById(
-            "position_id"
-        ).value,
-
         phone:phone,
 
         full_name:
@@ -592,21 +562,6 @@ async function saveCandidate(e){
         status:"Belum Mulai"
 
     };
-    //==========================================
-    // VALIDASI
-    //==========================================
-
-    if(payload.position_id==""){
-
-        alert("Silakan pilih posisi yang dilamar.");
-
-        btn.disabled=false;
-
-        btn.innerHTML="SIMPAN BIODATA";
-
-        return;
-
-    }
 
     //==========================================
     // INSERT CANDIDATE

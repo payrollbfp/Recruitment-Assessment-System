@@ -419,27 +419,21 @@ async function loadEvent(token){
 
     }
 
-    currentEvent=data;
+    if(!data){
 
-    console.log(data);
+    showError("Event recruitment tidak ditemukan.");
 
-    document
-    .getElementById("loading")
-    .style.display="none";
+    return;
 
-    document
-    .getElementById("content")
-    .style.display="block";
+}
 
-    document
-    .getElementById("eventName")
-    .innerHTML=data.event_name;
+currentEvent=data;
 
-    document
-    .getElementById("eventStatus")
-    .innerHTML=
-    "Status : "+data.status;
+document.getElementById("loading").style.display="none";
+document.getElementById("content").style.display="block";
 
+document.getElementById("eventName").textContent=data.event_name;
+document.getElementById("eventStatus").textContent="Status : "+data.status;
 }
 
 // =========================================

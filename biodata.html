@@ -613,13 +613,17 @@ async function saveCandidate(e){
 
     const {error:updateError}=await supabaseClient
 
-        .from("candidates")
+.from("candidates")
 
-        .update({
+.update({
 
-            candidate_code:candidateCode
+    candidate_code:candidateCode
 
-              console.log("Candidate :", data.id);
+})
+
+.eq("id",data.id);
+
+console.log("Candidate :", data.id);
 
         })
 
@@ -643,8 +647,24 @@ async function saveCandidate(e){
     // REDIRECT
     //==========================================
 
+if(updateError){
+
+    console.error(updateError);
+
+    alert(updateError.message);
+
+    btn.disabled=false;
+
+    btn.innerHTML="SIMPAN BIODATA";
+
+    return;
+
+}
+
+console.log("Redirect ke Dashboard...");
+
 window.location.href =
-`dashboard.html?id=${data.id}`;
+"dashboard.html?id=" + data.id;
 
 }
 

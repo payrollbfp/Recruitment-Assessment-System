@@ -11,6 +11,368 @@ content="width=device-width, initial-scale=1.0">
 
 <title>DISC Test</title>
 
+  <!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DISC Personality Test</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+
+background:#F3F6FB;
+padding:25px;
+
+}
+
+.container{
+
+max-width:900px;
+margin:auto;
+
+}
+
+.card{
+
+background:#fff;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+overflow:hidden;
+
+}
+
+.header{
+
+background:#243B88;
+color:white;
+padding:20px;
+
+}
+
+.header h2{
+
+font-size:26px;
+
+}
+
+.topbar{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:15px;
+
+}
+
+.progress{
+
+font-size:15px;
+
+}
+
+.timer{
+
+font-size:18px;
+font-weight:bold;
+
+}
+
+.progressbar{
+
+height:8px;
+background:#D6DDF6;
+border-radius:5px;
+margin-top:15px;
+
+}
+
+.progressfill{
+
+height:100%;
+width:33%;
+background:#4CAF50;
+border-radius:5px;
+
+}
+
+.table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+.table thead{
+
+background:#243B88;
+color:white;
+
+}
+
+.table th{
+
+padding:14px;
+
+}
+
+.table td{
+
+padding:16px;
+border-bottom:1px solid #ECECEC;
+
+}
+
+.table td:nth-child(1){
+
+width:60px;
+text-align:center;
+font-weight:bold;
+
+}
+
+.table td:nth-child(3),
+.table td:nth-child(4){
+
+width:70px;
+text-align:center;
+
+}
+
+input[type=radio]{
+
+width:24px;
+height:24px;
+cursor:pointer;
+
+}
+
+.navigation{
+
+display:flex;
+justify-content:space-between;
+padding:25px;
+
+}
+
+button{
+
+height:48px;
+padding:0 35px;
+border:none;
+border-radius:8px;
+background:#2563EB;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#1D4ED8;
+
+}
+
+  <script>
+
+const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+  async function loadQuestions(){
+
+const {data,error}=await supabaseClient
+
+.from("disc_questions")
+
+.select("*")
+
+.eq("active",true)
+
+.order("question_no");
+
+if(error){
+
+console.error(error);
+
+alert(error.message);
+
+return;
+
+}
+
+questions=data;
+
+console.log(questions);
+
+}
+
+let currentQuestion=1;
+
+let questions=[];
+
+document.addEventListener(
+"DOMContentLoaded",
+init
+);
+
+async function init(){
+
+await loadQuestions();
+
+showQuestion();
+
+}
+
+</script>
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="header">
+
+<h2>DISC Personality Test</h2>
+
+<div class="topbar">
+
+<div class="progress">
+
+Soal 8 dari 24
+
+</div>
+
+<div class="timer">
+
+14:52
+
+</div>
+
+</div>
+
+<div class="progressbar">
+
+<div class="progressfill"></div>
+
+</div>
+
+</div>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>No</th>
+
+<th>Gambaran Diri</th>
+
+<th>P</th>
+
+<th>K</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td rowspan="4">8</td>
+
+<td>Penyemangat yang baik</td>
+
+<td><input type="radio" name="P"></td>
+
+<td><input type="radio" name="K"></td>
+
+</tr>
+
+<tr>
+
+<td>Pendengar yang baik</td>
+
+<td><input type="radio" name="P"></td>
+
+<td><input type="radio" name="K"></td>
+
+</tr>
+
+<tr>
+
+<td>Penganalisa yang baik</td>
+
+<td><input type="radio" name="P"></td>
+
+<td><input type="radio" name="K"></td>
+
+</tr>
+
+<tr>
+
+<td>Delegator yang baik</td>
+
+<td><input type="radio" name="P"></td>
+
+<td><input type="radio" name="K"></td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+<div class="navigation">
+
+<button>
+
+◀ Sebelumnya
+
+</button>
+
+<button>
+
+Berikutnya ▶
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</body>
+
+</html>
+
 <style>
   
 body{

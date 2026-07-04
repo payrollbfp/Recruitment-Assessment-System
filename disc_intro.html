@@ -188,6 +188,29 @@ background:#1D4ED8;
     </div>
 
 </div>
+
+  <script>
+
+const params = new URLSearchParams(window.location.search);
+
+const candidateId = params.get("id");
+
+document.getElementById("btnStart").addEventListener("click", function(){
+
+    if(!candidateId){
+
+        alert("Candidate ID tidak ditemukan.");
+
+        return;
+
+    }
+
+    window.location.href =
+    "disc_test.html?id=" + candidateId;
+
+});
+
+</script>
 </body>
 
 </html>

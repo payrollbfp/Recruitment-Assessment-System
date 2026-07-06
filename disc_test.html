@@ -1,24 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="id">
 
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>DISC Test</title>
-
-  <!DOCTYPE html>
-<html lang="id">
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>DISC Personality Test</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
@@ -32,7 +22,7 @@ font-family:Segoe UI,Tahoma,sans-serif;
 body{
 
 background:#F3F6FB;
-padding:25px;
+padding:20px;
 
 }
 
@@ -54,7 +44,7 @@ overflow:hidden;
 
 .header{
 
-background:#243B88;
+background:#1E3A8A;
 color:white;
 padding:20px;
 
@@ -62,7 +52,7 @@ padding:20px;
 
 .header h2{
 
-font-size:26px;
+font-size:28px;
 
 }
 
@@ -77,32 +67,34 @@ margin-top:15px;
 
 .progress{
 
-font-size:15px;
+font-size:16px;
 
 }
 
 .timer{
 
-font-size:18px;
+font-size:22px;
 font-weight:bold;
 
 }
 
 .progressbar{
 
-height:8px;
-background:#D6DDF6;
-border-radius:5px;
 margin-top:15px;
+height:8px;
+background:#BFD0FF;
+border-radius:10px;
 
 }
 
 .progressfill{
 
 height:100%;
-width:33%;
-background:#4CAF50;
-border-radius:5px;
+width:0%;
+background:#22C55E;
+border-radius:10px;
+
+transition:.3s;
 
 }
 
@@ -115,7 +107,7 @@ border-collapse:collapse;
 
 .table thead{
 
-background:#243B88;
+background:#2446A8;
 color:white;
 
 }
@@ -124,18 +116,20 @@ color:white;
 
 padding:14px;
 
+font-size:16px;
+
 }
 
 .table td{
 
-padding:16px;
-border-bottom:1px solid #ECECEC;
+padding:18px;
+border-bottom:1px solid #E5E7EB;
 
 }
 
 .table td:nth-child(1){
 
-width:60px;
+width:70px;
 text-align:center;
 font-weight:bold;
 
@@ -151,8 +145,8 @@ text-align:center;
 
 input[type=radio]{
 
-width:24px;
-height:24px;
+width:22px;
+height:22px;
 cursor:pointer;
 
 }
@@ -167,14 +161,20 @@ padding:25px;
 
 button{
 
-height:48px;
+height:50px;
 padding:0 35px;
+
 border:none;
 border-radius:8px;
+
 background:#2563EB;
+
 color:white;
+
 font-size:16px;
+
 font-weight:bold;
+
 cursor:pointer;
 
 }
@@ -185,63 +185,21 @@ background:#1D4ED8;
 
 }
 
-  <script>
+button:disabled{
 
-const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
-
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
-
-const supabaseClient=supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-  async function loadQuestions(){
-
-const {data,error}=await supabaseClient
-
-.from("disc_questions")
-
-.select("*")
-
-.eq("active",true)
-
-.order("question_no");
-
-if(error){
-
-console.error(error);
-
-alert(error.message);
-
-return;
+background:#94A3B8;
+cursor:not-allowed;
 
 }
 
-questions=data;
+.loading{
 
-console.log(questions);
-
-}
-
-let currentQuestion=1;
-
-let questions=[];
-
-document.addEventListener(
-"DOMContentLoaded",
-init
-);
-
-async function init(){
-
-await loadQuestions();
-
-showQuestion();
+padding:40px;
+text-align:center;
+font-size:18px;
+color:#666;
 
 }
-
-</script>
 
 </style>
 
@@ -255,19 +213,27 @@ showQuestion();
 
 <div class="header">
 
-<h2>DISC Personality Test</h2>
+<h2>
+
+DISC Personality Test
+
+</h2>
 
 <div class="topbar">
 
-<div class="progress">
+<div
+id="progressText"
+class="progress">
 
-Soal 8 dari 24
+Memuat...
 
 </div>
 
-<div class="timer">
+<div
+id="timer"
+class="timer">
 
-14:52
+00:00
 
 </div>
 
@@ -275,13 +241,28 @@ Soal 8 dari 24
 
 <div class="progressbar">
 
-<div class="progressfill"></div>
+<div
+id="progressFill"
+class="progressfill">
 
 </div>
 
 </div>
 
-<table class="table">
+</div>
+
+<div
+id="loading"
+class="loading">
+
+Mengambil Soal...
+
+</div>
+
+<table
+id="questionTable"
+class="table"
+style="display:none;">
 
 <thead>
 
@@ -299,49 +280,8 @@ Soal 8 dari 24
 
 </thead>
 
-<tbody>
-
-<tr>
-
-<td rowspan="4">8</td>
-
-<td>Penyemangat yang baik</td>
-
-<td><input type="radio" name="P"></td>
-
-<td><input type="radio" name="K"></td>
-
-</tr>
-
-<tr>
-
-<td>Pendengar yang baik</td>
-
-<td><input type="radio" name="P"></td>
-
-<td><input type="radio" name="K"></td>
-
-</tr>
-
-<tr>
-
-<td>Penganalisa yang baik</td>
-
-<td><input type="radio" name="P"></td>
-
-<td><input type="radio" name="K"></td>
-
-</tr>
-
-<tr>
-
-<td>Delegator yang baik</td>
-
-<td><input type="radio" name="P"></td>
-
-<td><input type="radio" name="K"></td>
-
-</tr>
+<tbody
+id="questionBody">
 
 </tbody>
 
@@ -349,13 +289,13 @@ Soal 8 dari 24
 
 <div class="navigation">
 
-<button>
+<button id="btnPrev">
 
 ◀ Sebelumnya
 
 </button>
 
-<button>
+<button id="btnNext">
 
 Berikutnya ▶
 
@@ -367,83 +307,580 @@ Berikutnya ▶
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
 
-</body>
+//===================================
+// SUPABASE
+//===================================
 
-</html>
+const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
 
-<style>
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient=
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+//===================================
+// GLOBAL
+//===================================
+
+let candidateId=null;
+
+let candidate=null;
+
+let assessment=null;
+
+let questions=[];
+
+let currentQuestion=1;
+
+let totalQuestion=0;
+
+let startQuestionTime=Date.now();
+
+let answers={};
+
+let remainingSeconds=0;
+
+let timerInterval=null;
+
+//===================================
+// URL PARAMETER
+//===================================
+
+const params=new URLSearchParams(window.location.search);
+
+candidateId=params.get("id");
+
+//===================================
+// START
+//===================================
+
+document.addEventListener(
+"DOMContentLoaded",
+init
+);
+
+async function init(){
+
+    if(!candidateId){
+
+        alert("Candidate tidak ditemukan.");
+
+        window.location.href="login.html";
+
+        return;
+
+    }
+
+await loadCandidate();
+
+await loadAssessment();
+
+await loadQuestions();
+
+await loadAnswers();
+
+if(Object.keys(answers).length>0){
+
+currentQuestion=
+
+Object.keys(answers).length+1;
+
+}
   
-body{
-
-background:#F3F6FB;
-
-font-family:Segoe UI;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-height:100vh;
+showQuestion();
 
 }
 
-.card{
+//===================================
+// LOAD CANDIDATE
+//===================================
 
-background:white;
+async function loadCandidate(){
 
-padding:40px;
+    const {data,error}=await supabaseClient
 
-border-radius:12px;
+    .from("candidates")
 
-box-shadow:0 10px 25px rgba(0,0,0,.08);
+    .select("*")
 
-text-align:center;
+    .eq("id",candidateId)
 
-width:500px;
+    .single();
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    candidate=data;
+
+    console.log("Candidate :",candidate);
 
 }
 
-h1{
+remainingSeconds=assessment.duration_minutes*60;
 
-color:#1E3A8A;
+startTimer();
 
-margin-bottom:20px;
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    timerInterval=setInterval(()=>{
+
+        remainingSeconds--;
+
+        const m=Math.floor(remainingSeconds/60);
+
+        const s=remainingSeconds%60;
+
+        document.getElementById("timer").innerHTML=
+
+        String(m).padStart(2,"0")
+
+        +":"
+
+        +String(s).padStart(2,"0");
+
+        if(remainingSeconds<=0){
+
+            clearInterval(timerInterval);
+
+            finishDISC();
+
+        }
+
+    },1000);
 
 }
 
-p{
+window.onbeforeunload=function(){
 
-font-size:18px;
+return "Assessment sedang berlangsung.";
 
-color:#666;
+}
+//===================================
+// LOAD ASSESSMENT
+//===================================
+
+async function loadAssessment(){
+
+    const {data,error}=await supabaseClient
+
+    .from("assessment_tests")
+
+    .select("*")
+
+    .eq("test_code","DISC")
+
+    .single();
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    assessment=data;
+
+    console.log("Assessment :",assessment);
 
 }
 
-</style>
 
-</head>
+//===================================
+// LOAD QUESTIONS
+//===================================
 
-<body>
+async function loadQuestions(){
 
-<div class="card">
+    const {data,error}=await supabaseClient
 
-<h1>
+    .from("disc_questions")
 
-DISC Personality Test
+    .select("*")
 
-</h1>
+    .eq("active",true)
 
-<p>
+    .order("question_no");
 
-Halaman ini akan berisi soal DISC.
+    if(error){
 
-</p>
+        console.error(error);
 
-</div>
+        alert(error.message);
+
+        return;
+
+    }
+
+    questions=data;
+
+    totalQuestion=questions.length;
+
+    console.log("Questions :",questions);
+
+}
+
+btn.disabled=false;
+
+//===================================
+// SHOW QUESTION
+//===================================
+
+function showQuestion(){
+
+    const q=questions.find(
+        x=>x.question_no===currentQuestion
+    );
+
+    if(!q)return;
+
+    document.getElementById("loading").style.display="none";
+
+    document.getElementById("questionTable").style.display="table";
+
+    document.getElementById("progressText").innerHTML=
+    "Soal "+currentQuestion+" dari "+totalQuestion
+
+    document.getElementById("progressFill").style.width=const old=answers[currentQuestion];
+
+if(old){
+
+    document.querySelector(
+        `input[name="most"][value="${old.most_answer}"]`
+    ).checked=true;
+
+    document.querySelector(
+        `input[name="least"][value="${old.least_answer}"]`
+    ).checked=true;
+
+}
+    ((currentQuestion/totalQuestion)*100)+"%";
+
+    document.getElementById("questionBody").innerHTML=`
+
+    
+
+<tr>
+
+<td rowspan="4">${q.question_no}</td>
+
+<td>${q.option_a}</td>
+
+<td><input type="radio" name="most" value="A"></td>
+
+<td><input type="radio" name="least" value="A"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_b}</td>
+
+<td><input type="radio" name="most" value="B"></td>
+
+<td><input type="radio" name="least" value="B"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_c}</td>
+
+<td><input type="radio" name="most" value="C"></td>
+
+<td><input type="radio" name="least" value="C"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_d}</td>
+
+<td><input type="radio" name="most" value="D"></td>
+
+<td><input type="radio" name="least" value="D"></td>
+
+</tr>
+
+`;
+
+}
+
+//===================================
+// BUTTON EVENT
+//===================================
+
+document
+.getElementById("btnNext")
+.addEventListener(
+"click",
+nextQuestion
+);
+
+document
+.getElementById("btnPrev")
+.addEventListener(
+"click",
+prevQuestion
+);
+
+//===================================
+// VALIDASI
+//===================================
+
+function getAnswer(){
+
+    const most=document.querySelector(
+    'input[name="most"]:checked'
+    );
+
+    const least=document.querySelector(
+    'input[name="least"]:checked'
+    );
+
+    if(!most || !least){
+
+        alert("Silakan pilih P dan K.");
+
+        return null;
+
+    }
+
+    if(most.value===least.value){
+
+        alert("P dan K tidak boleh sama.");
+
+        return null;
+
+    }
+
+    return{
+
+        most:most.value,
+
+        least:least.value
+
+    };
+
+}
+
+//===================================
+// SAVE ANSWER
+//===================================
+
+async function saveAnswer(answer){
+
+    const duration=Math.floor(
+        (Date.now()-startQuestionTime)/1000
+    );
+
+    const payload={
+
+        candidate_id:candidateId,
+
+        question_no:currentQuestion,
+
+        most_answer:answer.most,
+
+        least_answer:answer.least,
+
+        duration_seconds:duration
+
+    };
+
+    const old=answers[currentQuestion];
+
+    let error;
+
+    if(old){
+
+        ({error}=await supabaseClient
+
+        .from("disc_answers")
+
+        .update(payload)
+
+        .eq("id",old.id));
+
+    }
+
+    else{
+
+        ({error}=await supabaseClient
+
+        .from("disc_answers")
+
+        .insert(payload));
+
+    }
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return false;
+
+    }
+
+    await loadAnswers();
+
+    return true;
+
+}
+//===================================
+// NEXT
+//===================================
+const btn=document.getElementById("btnNext");
+
+btn.disabled=true;
+async function nextQuestion(){
+
+    const btn=document.getElementById("btnNext");
+
+    btn.disabled=true;
+
+    const answer=getAnswer();
+
+    if(!answer){
+
+        btn.disabled=false;
+        return;
+
+    }
+
+    const ok=await saveAnswer(answer);
+
+    if(!ok){
+
+        btn.disabled=false;
+        return;
+
+    }
+
+    if(currentQuestion<totalQuestion){
+
+        currentQuestion++;
+
+        startQuestionTime=Date.now();
+
+        showQuestion();
+
+    }
+
+else{
+
+await finishDISC();
+
+}
+
+    }
+
+    btn.disabled=false;
+
+}
+
+
+//===================================
+// PREVIOUS
+//===================================
+
+function prevQuestion(){
+
+    if(currentQuestion==1)return;
+
+    currentQuestion--;
+
+    showQuestion();
+
+}
+
+//===================================
+// LOAD ANSWERS
+//===================================
+
+async function loadAnswers(){
+
+    const {data,error}=await supabaseClient
+
+    .from("disc_answers")
+
+    .select("*")
+
+    .eq("candidate_id",candidateId);
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+    answers={};
+
+    data.forEach(item=>{
+
+        answers[item.question_no]=item;
+
+    });
+
+    console.log("Answer Cache :",answers);
+
+}
+
+  const selesai=
+
+Object.keys(answers).length;
+
+document.getElementById("progressFill").style.width=
+
+(selesai/totalQuestion*100)+"%";
+
+  async function finishDISC(){
+
+    clearInterval(timerInterval);
+
+    await supabaseClient
+
+    .from("candidates")
+
+    .update({
+
+        status:"DISC Selesai"
+
+    })
+
+    .eq("id",candidateId);
+
+    alert("DISC selesai.");
+
+    window.location.href=
+
+    "dashboard.html?id="+candidateId;
+
+}
+  
+
+
+</script>
 
 </body>
 

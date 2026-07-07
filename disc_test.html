@@ -329,7 +329,210 @@ Berikutnya ▶
 
 </div>
 
-</body>
+ <script>
+
+ //==========================================
+// SUPABASE
+//==========================================
+
+const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+//==========================================
+// APP
+//==========================================
+
+const APP={
+
+candidateId:null,
+
+candidate:null,
+
+assessment:null,
+
+questions:[],
+
+answers:{},
+
+currentQuestion:1,
+
+totalQuestion:0,
+
+remainingSeconds:0,
+
+timer:null
+
+};  
+
+ //==========================================
+// START
+//==========================================
+
+document.addEventListener(
+"DOMContentLoaded",
+init
+);
+
+async function init(){
+
+const params=new URLSearchParams(
+window.location.search
+);
+
+APP.candidateId=params.get("id");
+
+if(!APP.candidateId){
+
+alert("Candidate tidak ditemukan");
+
+window.location.href="login.html";
+
+return;
+
+}
+
+await loadCandidate();
+
+await loadAssessment();
+
+await loadQuestions();
+
+await loadAnswers();
+
+console.log(APP);
+
+}
+
+//==========================================
+// LOAD CANDIDATE
+//==========================================
+
+async function loadCandidate(){
+
+const {data,error}=await supabaseClient
+
+.from("candidates")
+
+.select("*")
+
+.eq("id",APP.candidateId)
+
+.single();
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+APP.candidate=data;
+
+}
+
+  //==========================================
+// LOAD ASSESSMENT
+//==========================================
+
+async function loadAssessment(){
+
+const {data,error}=await supabaseClient
+
+.from("assessment_tests")
+
+.select("*")
+
+.eq("test_code","DISC")
+
+.single();
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+APP.assessment=data;
+
+APP.remainingSeconds=
+
+data.duration_minutes*60;
+
+}
+
+//==========================================
+// LOAD QUESTIONS
+//==========================================
+
+async function loadQuestions(){
+
+const {data,error}=await supabaseClient
+
+.from("disc_questions")
+
+.select("*")
+
+.eq("active",true)
+
+.order("question_no");
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+APP.questions=data;
+
+APP.totalQuestion=data.length;
+
+}
+
+//==========================================
+// LOAD ANSWERS
+//==========================================
+
+async function loadAnswers(){
+
+const {data,error}=await supabaseClient
+
+.from("disc_answers")
+
+.select("*")
+
+.eq("candidate_id",APP.candidateId);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+APP.answers={};
+
+data.forEach(item=>{
+
+APP.answers[item.question_no]=item;
+
+});
+
+}
+
+</script>
+ </body>
 
 </html>
 

@@ -381,40 +381,37 @@ init
 
 async function init(){
 
-const params=new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
 
-APP.candidateId=params.get("id");
+    APP.candidateId = params.get("id");
 
-if(!APP.candidateId){
+    if(!APP.candidateId){
 
-alert("Candidate tidak ditemukan");
+        alert("Candidate tidak ditemukan");
 
-window.location.href="login.html";
+        window.location.href="login.html";
 
-return;
+        return;
 
-}
+    }
 
-await loadCandidate();
+    await loadCandidate();
 
-await loadAssessment();
+    await loadAssessment();
 
-await loadQuestions();
+    await loadQuestions();
 
-console.log(APP.questions);
+    await loadAnswers();
 
-await loadAnswers();
+    restoreCurrentQuestion();
 
-restoreCurrentQuestion();
+    startTimer();
 
-startTimer();
+    showQuestion();
 
-showQuestion();
-
-console.log(APP);
+    console.log(APP);
 
 }
-
 //==========================================
 // LOAD CANDIDATE
 //==========================================
@@ -523,94 +520,35 @@ String(s).padStart(2,"0");
 // SHOW QUESTION
 //==========================================
 
-function showQuestion(){
+async function loadQuestions(){
 
-const q=APP.questions.find(
+    const {data,error}=await supabaseClient
 
-x=>x.question_no===APP.currentQuestion
+    .from("disc_questions")
 
-);
+    .select("*")
 
-if(!q)return;
+    .eq("active",true)
 
-document.getElementById("loading").style.display="none";
+    .order("question_no");
 
-document.getElementById("questionTable").style.display="table";
+    console.log(error);
 
-document.getElementById("progressText").innerHTML=
+    console.log(data);
 
-"Soal "
+    if(error){
 
-+
+        alert(error.message);
 
-APP.currentQuestion
+        return;
 
-+
+    }
 
-" dari "
+    APP.questions=data;
 
-+
-
-APP.totalQuestion;
-
-document.getElementById("progressFill").style.width=
-
-(APP.currentQuestion/APP.totalQuestion*100)
-
-+
-
-"%";
-
-document.getElementById("questionBody").innerHTML=`
-
-<tr>
-
-<td rowspan="4">${q.question_no}</td>
-
-<td>${q.option_a}</td>
-
-<td><input type="radio" name="most" value="A"></td>
-
-<td><input type="radio" name="least" value="A"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_b}</td>
-
-<td><input type="radio" name="most" value="B"></td>
-
-<td><input type="radio" name="least" value="B"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_c}</td>
-
-<td><input type="radio" name="most" value="C"></td>
-
-<td><input type="radio" name="least" value="C"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_d}</td>
-
-<td><input type="radio" name="most" value="D"></td>
-
-<td><input type="radio" name="least" value="D"></td>
-
-</tr>
-
-`;
-
-restoreAnswer();
+    APP.totalQuestion=data.length;
 
 }
-
 //==========================================
 // RESTORE ANSWER
 //==========================================

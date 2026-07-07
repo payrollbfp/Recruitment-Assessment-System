@@ -459,38 +459,31 @@ APP.candidate=data[0];
 async function loadAssessment(){
 
     const {data,error}=await supabaseClient
+        .from("assessment_tests")
+        .select("*");
 
-    .from("assessment_tests")
-
-    .select("*")
-
-    .eq("test_code","DISC");
-
-    console.log("Assessment =",data);
-    console.log("Assessment Error =",error);
+    console.log("Assessment Data :", data);
+    console.log("Assessment Error :", error);
 
     if(error){
-
         alert(error.message);
-
         return;
-
     }
 
-    if(data.length===0){
+    const disc = data.find(x => x.test_code === "DISC");
 
+    console.log("DISC =", disc);
+
+    if(!disc){
         alert("Assessment DISC tidak ditemukan.");
-
         return;
-
     }
 
-    APP.assessment=data[0];
-
-    APP.remainingSeconds=
-        APP.assessment.duration_minutes*60;
+    APP.assessment = disc;
+    APP.remainingSeconds = disc.duration_minutes * 60;
 
 }
+  
 //==========================================
 // TIMER
 //==========================================

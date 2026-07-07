@@ -301,6 +301,12 @@ Berikutnya ▶
 
 </button>
 
+<button id="btnDebug">
+
+TEST INPUT
+
+</button>
+
 </div>
 
 </div>
@@ -640,6 +646,13 @@ document
 prevQuestion
 );
 
+document
+.getElementById("btnDebug")
+.addEventListener(
+"click",
+buildInput
+);
+
 //===================================
 // VALIDASI
 //===================================
@@ -843,6 +856,83 @@ async function loadAnswers(){
     });
 
     console.log("Answer Cache :",answers);
+
+}
+
+//===================================
+// BUILD INPUT
+//===================================
+
+function buildInput(){
+
+    console.clear();
+
+    console.log("===== DISC INPUT =====");
+
+    questions.forEach(q=>{
+
+        const ans=answers[q.question_no];
+
+        if(!ans)return;
+
+        let most="";
+        let least="";
+
+        switch(ans.most_answer){
+
+            case "A":
+                most=q.option_a_most;
+                break;
+
+            case "B":
+                most=q.option_b_most;
+                break;
+
+            case "C":
+                most=q.option_c_most;
+                break;
+
+            case "D":
+                most=q.option_d_most;
+                break;
+
+        }
+
+        switch(ans.least_answer){
+
+            case "A":
+                least=q.option_a_least;
+                break;
+
+            case "B":
+                least=q.option_b_least;
+                break;
+
+            case "C":
+                least=q.option_c_least;
+                break;
+
+            case "D":
+                least=q.option_d_least;
+                break;
+
+        }
+
+        console.table({
+
+            soal:q.question_no,
+
+            most_answer:ans.most_answer,
+
+            least_answer:ans.least_answer,
+
+            most_result:most,
+
+            least_result:least
+
+        });
+
+    });
 
 }
 

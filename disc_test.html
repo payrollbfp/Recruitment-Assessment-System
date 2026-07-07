@@ -386,6 +386,11 @@ await loadCandidate();
 
 await loadAssessment();
 
+remainingSeconds=assessment.duration_minutes*60;
+
+startTimer();
+
+    
 await loadQuestions();
 
 await loadAnswers();
@@ -433,10 +438,6 @@ async function loadCandidate(){
     console.log("Candidate :",candidate);
 
 }
-
-remainingSeconds=assessment.duration_minutes*60;
-
-startTimer();
 
 function startTimer(){
 
@@ -560,10 +561,14 @@ function showQuestion(){
 
     document.getElementById("questionTable").style.display="table";
 
-    document.getElementById("progressText").innerHTML=
-    "Soal "+currentQuestion+" dari "+totalQuestion
+    document.getElementById("progressText").innerHTML =
+"Soal " + currentQuestion + " dari " + totalQuestion;
 
-    document.getElementById("progressFill").style.width=const old=answers[currentQuestion];
+document.getElementById("progressFill").style.width =
+((currentQuestion / totalQuestion) * 100) + "%";
+ document.getElementById("questionBody").innerHTML=`
+    
+const old = answers[currentQuestion];
 
 if(old){
 
@@ -577,8 +582,6 @@ if(old){
 
 }
     ((currentQuestion/totalQuestion)*100)+"%";
-
-    document.getElementById("questionBody").innerHTML=`
 
     
 
@@ -770,23 +773,7 @@ async function nextQuestion(){
 
     btn.disabled=true;
 
-    const answer=getAnswer();
-
-    if(!answer){
-
-        btn.disabled=false;
-        return;
-
-    }
-
-    const ok=await saveAnswer(answer);
-
-    if(!ok){
-
-        btn.disabled=false;
-        return;
-
-    }
+    ...
 
     if(currentQuestion<totalQuestion){
 
@@ -796,20 +783,15 @@ async function nextQuestion(){
 
         showQuestion();
 
-    }
+    }else{
 
-else{
-
-await finishDISC();
-
-}
+        await finishDISC();
 
     }
 
     btn.disabled=false;
 
 }
-
 
 //===================================
 // PREVIOUS

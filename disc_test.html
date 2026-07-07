@@ -566,71 +566,49 @@ function showQuestion(){
 
 document.getElementById("progressFill").style.width =
 ((currentQuestion / totalQuestion) * 100) + "%";
- document.getElementById("questionBody").innerHTML=`
-    
+ 
+document.getElementById("questionBody").innerHTML = `
+
+<tr>
+<td rowspan="4">${q.question_no}</td>
+<td>${q.option_a}</td>
+<td><input type="radio" name="most" value="A"></td>
+<td><input type="radio" name="least" value="A"></td>
+</tr>
+
+<tr>
+<td>${q.option_b}</td>
+<td><input type="radio" name="most" value="B"></td>
+<td><input type="radio" name="least" value="B"></td>
+</tr>
+
+<tr>
+<td>${q.option_c}</td>
+<td><input type="radio" name="most" value="C"></td>
+<td><input type="radio" name="least" value="C"></td>
+</tr>
+
+<tr>
+<td>${q.option_d}</td>
+<td><input type="radio" name="most" value="D"></td>
+<td><input type="radio" name="least" value="D"></td>
+</tr>
+
+`;
+
 const old = answers[currentQuestion];
 
 if(old){
 
     document.querySelector(
         `input[name="most"][value="${old.most_answer}"]`
-    ).checked=true;
+    ).checked = true;
 
     document.querySelector(
         `input[name="least"][value="${old.least_answer}"]`
-    ).checked=true;
+    ).checked = true;
 
 }
-    ((currentQuestion/totalQuestion)*100)+"%";
-
-    
-
-<tr>
-
-<td rowspan="4">${q.question_no}</td>
-
-<td>${q.option_a}</td>
-
-<td><input type="radio" name="most" value="A"></td>
-
-<td><input type="radio" name="least" value="A"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_b}</td>
-
-<td><input type="radio" name="most" value="B"></td>
-
-<td><input type="radio" name="least" value="B"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_c}</td>
-
-<td><input type="radio" name="most" value="C"></td>
-
-<td><input type="radio" name="least" value="C"></td>
-
-</tr>
-
-<tr>
-
-<td>${q.option_d}</td>
-
-<td><input type="radio" name="most" value="D"></td>
-
-<td><input type="radio" name="least" value="D"></td>
-
-</tr>
-
-`;
-
-}
-
 //===================================
 // BUTTON EVENT
 //===================================

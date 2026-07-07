@@ -381,9 +381,7 @@ init
 
 async function init(){
 
-const params=new URLSearchParams(
-window.location.search
-);
+const params=new URLSearchParams(window.location.search);
 
 APP.candidateId=params.get("id");
 
@@ -401,15 +399,17 @@ await loadCandidate();
 
 await loadAssessment();
 
+await loadQuestions();
+
+console.log(APP.questions);
+
+await loadAnswers();
+
 restoreCurrentQuestion();
 
 startTimer();
 
 showQuestion();
-
-await loadQuestions();
-
-await loadAnswers();
 
 console.log(APP);
 

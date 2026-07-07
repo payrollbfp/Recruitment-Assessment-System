@@ -458,32 +458,39 @@ APP.candidate=data[0];
 
 async function loadAssessment(){
 
-const {data,error}=await supabaseClient
+    const {data,error}=await supabaseClient
 
-.from("assessment_tests")
+    .from("assessment_tests")
 
-.select("*")
+    .select("*")
 
-.eq("test_code","DISC")
+    .eq("test_code","DISC");
 
-.single();
+    console.log("Assessment =",data);
+    console.log("Assessment Error =",error);
 
-if(error){
+    if(error){
 
-alert(error.message);
+        alert(error.message);
 
-return;
+        return;
+
+    }
+
+    if(data.length===0){
+
+        alert("Assessment DISC tidak ditemukan.");
+
+        return;
+
+    }
+
+    APP.assessment=data[0];
+
+    APP.remainingSeconds=
+        APP.assessment.duration_minutes*60;
 
 }
-
-APP.assessment=data;
-
-APP.remainingSeconds=
-
-data.duration_minutes*60;
-
-}
-
 //==========================================
 // TIMER
 //==========================================
@@ -532,36 +539,53 @@ String(s).padStart(2,"0");
 // SHOW QUESTION
 //==========================================
 
-async function loadQuestions(){
+function showQuestion(){
 
-    const {data,error}=await supabaseClient
+    const q = APP.questions.find(
+        x => x.question_no === APP.currentQuestion
+    );
 
-    .from("disc_questions")
+    if(!q) return;
 
-    .select("*")
+    document.getElementById("loading").style.display="none";
+    document.getElementById("questionTable").style.display="table";
 
-    .eq("active",true)
+    document.getElementById("progressText").innerHTML =
+        "Soal " + APP.currentQuestion + " dari " + APP.totalQuestion;
 
-    .order("question_no");
+    document.getElementById("progressFill").style.width =
+        ((APP.currentQuestion / APP.totalQuestion) * 100) + "%";
 
-    console.log(error);
+    document.getElementById("questionBody").innerHTML = `
+        <tr>
+            <td rowspan="4">${q.question_no}</td>
+            <td>${q.option_a}</td>
+            <td><input type="radio" name="most" value="A"></td>
+            <td><input type="radio" name="least" value="A"></td>
+        </tr>
 
-    console.log(data);
+        <tr>
+            <td>${q.option_b}</td>
+            <td><input type="radio" name="most" value="B"></td>
+            <td><input type="radio" name="least" value="B"></td>
+        </tr>
 
-    if(error){
+        <tr>
+            <td>${q.option_c}</td>
+            <td><input type="radio" name="most" value="C"></td>
+            <td><input type="radio" name="least" value="C"></td>
+        </tr>
 
-        alert(error.message);
+        <tr>
+            <td>${q.option_d}</td>
+            <td><input type="radio" name="most" value="D"></td>
+            <td><input type="radio" name="least" value="D"></td>
+        </tr>
+    `;
 
-        return;
+    restoreAnswer();
 
-    }
-
-    APP.questions=data;
-
-    APP.totalQuestion=data.length;
-
-}
-//==========================================
+}//==========================================
 // RESTORE ANSWER
 //==========================================
 

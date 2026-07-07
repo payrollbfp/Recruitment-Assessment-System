@@ -401,6 +401,12 @@ await loadCandidate();
 
 await loadAssessment();
 
+restoreCurrentQuestion();
+
+startTimer();
+
+showQuestion();
+
 await loadQuestions();
 
 await loadAnswers();
@@ -470,6 +476,168 @@ data.duration_minutes*60;
 }
 
 //==========================================
+// TIMER
+//==========================================
+
+function startTimer(){
+
+updateTimer();
+
+APP.timer=setInterval(()=>{
+
+APP.remainingSeconds--;
+
+updateTimer();
+
+if(APP.remainingSeconds<=0){
+
+clearInterval(APP.timer);
+
+alert("Waktu habis.");
+
+}
+
+},1000);
+
+}
+
+function updateTimer(){
+
+const m=Math.floor(APP.remainingSeconds/60);
+
+const s=APP.remainingSeconds%60;
+
+document.getElementById("timer").innerHTML=
+
+String(m).padStart(2,"0")
+
++":"
+
++
+
+String(s).padStart(2,"0");
+
+}
+
+ //==========================================
+// SHOW QUESTION
+//==========================================
+
+function showQuestion(){
+
+const q=APP.questions.find(
+
+x=>x.question_no===APP.currentQuestion
+
+);
+
+if(!q)return;
+
+document.getElementById("loading").style.display="none";
+
+document.getElementById("questionTable").style.display="table";
+
+document.getElementById("progressText").innerHTML=
+
+"Soal "
+
++
+
+APP.currentQuestion
+
++
+
+" dari "
+
++
+
+APP.totalQuestion;
+
+document.getElementById("progressFill").style.width=
+
+(APP.currentQuestion/APP.totalQuestion*100)
+
++
+
+"%";
+
+document.getElementById("questionBody").innerHTML=`
+
+<tr>
+
+<td rowspan="4">${q.question_no}</td>
+
+<td>${q.option_a}</td>
+
+<td><input type="radio" name="most" value="A"></td>
+
+<td><input type="radio" name="least" value="A"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_b}</td>
+
+<td><input type="radio" name="most" value="B"></td>
+
+<td><input type="radio" name="least" value="B"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_c}</td>
+
+<td><input type="radio" name="most" value="C"></td>
+
+<td><input type="radio" name="least" value="C"></td>
+
+</tr>
+
+<tr>
+
+<td>${q.option_d}</td>
+
+<td><input type="radio" name="most" value="D"></td>
+
+<td><input type="radio" name="least" value="D"></td>
+
+</tr>
+
+`;
+
+restoreAnswer();
+
+}
+
+//==========================================
+// RESTORE ANSWER
+//==========================================
+
+function restoreAnswer(){
+
+const old=
+
+APP.answers[APP.currentQuestion];
+
+if(!old)return;
+
+document.querySelector(
+
+`input[name="most"][value="${old.most_answer}"]`
+
+).checked=true;
+
+document.querySelector(
+
+`input[name="least"][value="${old.least_answer}"]`
+
+).checked=true;
+
+}
+
+//==========================================
 // LOAD QUESTIONS
 //==========================================
 
@@ -528,6 +696,30 @@ data.forEach(item=>{
 APP.answers[item.question_no]=item;
 
 });
+
+}
+
+//==========================================
+// RESTORE CURRENT QUESTION
+//==========================================
+
+function restoreCurrentQuestion(){
+
+const totalAnswered=
+
+Object.keys(APP.answers).length;
+
+if(totalAnswered>0){
+
+APP.currentQuestion=totalAnswered+1;
+
+}
+
+if(APP.currentQuestion>APP.totalQuestion){
+
+APP.currentQuestion=APP.totalQuestion;
+
+}
 
 }
 

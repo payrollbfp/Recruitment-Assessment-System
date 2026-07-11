@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>DISC Scoring</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+}
+
+.container{
+width:100%;
+max-width:900px;
+margin:40px auto;
+}
+
+.card{
+background:#fff;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+overflow:hidden;
+}
+
+.header{
+background:#1E3A8A;
+color:#fff;
+padding:25px;
+}
+
+.header h2{
+font-size:28px;
+font-weight:700;
+}
+
+.content{
+padding:40px;
+}
+
+.status{
+font-size:20px;
+font-weight:600;
+color:#1E3A8A;
+margin-bottom:15px;
+}
+
+.substatus{
+font-size:15px;
+color:#666;
+}
+
+.progress{
+margin-top:30px;
+width:100%;
+height:12px;
+background:#E5E7EB;
+border-radius:30px;
+overflow:hidden;
+}
+
+.progress div{
+height:100%;
+width:0%;
+background:#22C55E;
+transition:.3s;
+}
+
+.log{
+margin-top:35px;
+background:#F9FAFB;
+border:1px solid #E5E7EB;
+border-radius:8px;
+padding:15px;
+height:320px;
+overflow:auto;
+font-size:14px;
+line-height:1.7;
+font-family:Consolas,monospace;
+}
+
+.ok{
+color:#16A34A;
+}
+
+.error{
+color:#DC2626;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="header">
+
+<h2>DISC Scoring Engine</h2>
+
+</div>
+
+<div class="content">
+
+<div id="status" class="status">
+
+Menghitung hasil DISC...
+
+</div>
+
+<div id="substatus" class="substatus">
+
+Mohon tunggu...
+
+</div>
+
+<div class="progress">
+
+<div id="progressBar"></div>
+
+</div>
+
+<div id="log" class="log"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+//====================================
+// SUPABASE
+//====================================
+
+const SUPABASE_URL="ISI_URL_ANDA";
+
+const SUPABASE_KEY="ISI_ANON_KEY_ANDA";
+
+const supabaseClient=supabase.createClient(
+
+SUPABASE_URL,
+
+SUPABASE_KEY
+
+);
+
+//====================================
+// APP
+//====================================
+
+const APP={
+
+candidateId:null,
+
+candidate:null,
+
+answers:[],
+
+result:{},
+
+mostArray:[],
+
+leastArray:[]
+
+};
+
+//====================================
+// LOG
+//====================================
+
+function log(text){
+
+document.getElementById("log").innerHTML+=text+"<br>";
+
+}
+
+function progress(percent,text){
+
+document.getElementById("progressBar").style.width=
+
+percent+"%";
+
+document.getElementById("substatus").innerHTML=text;
+
+}
+
+//====================================
+// START
+//====================================
+
+document.addEventListener(
+
+"DOMContentLoaded",
+
+init
+
+);
+
+async function init(){
+
+const params=
+
+new URLSearchParams(
+
+window.location.search
+
+);
+
+APP.candidateId=params.get("id");
+
+if(!APP.candidateId){
+
+alert("Candidate tidak ditemukan");
+
+return;
+
+}
+
+log("<span class='ok'>✔ Candidate ID : "+APP.candidateId+"</span>");
+
+progress(10,"Mengambil data kandidat...");
+
+await loadCandidate();
+
+progress(20,"Mengambil jawaban DISC...");
+
+await loadAnswers();
+
+/* PART 2
+akan dimulai dari sini */
+
+}

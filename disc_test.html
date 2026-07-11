@@ -603,22 +603,16 @@ document.querySelector(
 
 async function loadQuestions(){
 
-    const { data, error } = await supabaseClient
+    const result = await supabaseClient
         .from("disc_questions")
         .select("*");
 
-    console.log("Questions:", data);
-    console.log("Questions Error:", error);
+    console.log(result);
 
-    if(error){
-        alert(error.message);
-        return;
-    }
+    APP.questions = result.data ?? [];
+    APP.totalQuestion = APP.questions.length;
 
-    APP.questions = data;
-    APP.totalQuestion = data.length;
-}
-  
+}  
 //==========================================
 // LOAD ANSWERS
 //==========================================

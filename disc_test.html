@@ -463,6 +463,67 @@ showQuestion();
     console.log(APP);
 
 }
+
+//==========================================
+// BUTTON EVENT
+//==========================================
+
+document
+.getElementById("btnNext")
+.addEventListener("click", nextQuestion);
+
+document
+.getElementById("btnPrev")
+.addEventListener("click", prevQuestion);
+
+//==========================================
+// NEXT QUESTION
+//==========================================
+
+async function nextQuestion(){
+
+    const answer = getAnswer();
+
+    if(!answer) return;
+
+    const ok = await saveAnswer(answer);
+
+    if(!ok) return;
+
+    if(APP.currentQuestion < APP.totalQuestion){
+
+        APP.currentQuestion++;
+
+        showQuestion();
+
+    }else{
+
+        alert("Tes DISC selesai.");
+
+    }
+
+}
+
+//==========================================
+// PREVIOUS QUESTION
+//==========================================
+
+function prevQuestion(){
+
+    if(APP.currentQuestion==1){
+
+        return;
+
+    }
+
+    APP.currentQuestion--;
+
+    showQuestion();
+
+}
+  
+  
+  
 //==========================================
 // LOAD CANDIDATE
 //==========================================
@@ -614,6 +675,22 @@ function showQuestion(){
 
     restoreAnswer();
 
+ const btnNext=document.getElementById("btnNext");
+
+if(APP.currentQuestion===APP.totalQuestion){
+
+    btnNext.innerHTML="Selesai ✓";
+
+}else{
+
+    btnNext.innerHTML="Berikutnya ▶";
+
+}
+
+ document.getElementById("btnPrev").disabled=
+
+APP.currentQuestion===1;
+
 }//==========================================
 // RESTORE ANSWER
 //==========================================
@@ -640,6 +717,89 @@ document.querySelector(
 
 }
 
+//==========================================
+// GET ANSWER
+//==========================================
+
+function getAnswer(){
+
+    const most=document.querySelector('input[name="most"]:checked');
+
+    const least=document.querySelector('input[name="least"]:checked');
+
+    if(!most || !least){
+
+        alert("Silakan pilih P dan K.");
+
+        return null;
+
+    }
+
+    if(most.value===least.value){
+
+        alert("Pilihan P dan K tidak boleh sama.");
+
+        return null;
+
+    }
+
+    return{
+
+        most:most.value,
+
+        least:least.value
+
+    };
+
+}
+
+//==========================================
+// SAVE ANSWER
+//==========================================
+
+async function saveAnswer(answer){
+
+    const {error}=await supabaseClient
+
+    .from("disc_answers")
+
+    .upsert({
+
+        candidate_id:APP.candidateId,
+
+        question_no:APP.currentQuestion,
+
+        most_answer:answer.most,
+
+        least_answer:answer.least
+
+    },{
+
+        onConflict:"candidate_id,question_no"
+
+    });
+
+    if(error){
+
+        alert(error.message);
+
+        return false;
+
+    }
+
+    APP.answers[APP.currentQuestion]={
+
+        most_answer:answer.most,
+
+        least_answer:answer.least
+
+    };
+
+    return true;
+
+}
+
+  
 //==========================================
 // LOAD QUESTIONS
 //==========================================

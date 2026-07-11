@@ -150,9 +150,9 @@ Mohon tunggu...
 // SUPABASE
 //====================================
 
-const SUPABASE_URL="ISI_URL_ANDA";
+const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
 
-const SUPABASE_KEY="ISI_ANON_KEY_ANDA";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
 
 const supabaseClient=supabase.createClient(
 
@@ -244,7 +244,347 @@ progress(20,"Mengambil jawaban DISC...");
 
 await loadAnswers();
 
-/* PART 2
-akan dimulai dari sini */
+progress(30,"Mengambil data soal...");
+
+await loadQuestions();
+
+progress(40,"Memproses DISC Engine...");
+
+calculateDISC();
+
+progress(80,"Menyimpan hasil...");
+
+await saveResult();
+
+progress(100,"Selesai");
+
+document.getElementById("status").innerHTML=
+"DISC berhasil dihitung";
+
+setTimeout(()=>{
+
+window.location.href=
+"disc_report.html?id="+APP.candidateId;
+
+},1500);
 
 }
+
+//====================================
+// LOAD CANDIDATE
+//====================================
+
+async function loadCandidate(){
+
+const {data,error}=await supabaseClient
+
+.from("candidates")
+
+.select("*")
+
+.eq("id",APP.candidateId)
+
+.single();
+
+if(error){
+
+alert(error.message);
+
+throw error;
+
+}
+
+APP.candidate=data;
+
+log("✔ Candidate : "+data.full_name);
+
+}
+
+//====================================
+// LOAD ANSWERS
+//====================================
+
+async function loadAnswers(){
+
+const {data,error}=await supabaseClient
+
+.from("disc_answers")
+
+.select("*")
+
+.eq("candidate_id",APP.candidateId)
+
+.order("question_no");
+
+if(error){
+
+alert(error.message);
+
+throw error;
+
+}
+
+APP.answers=data;
+
+log("✔ Total Jawaban : "+data.length);
+
+}
+
+//====================================
+// LOAD QUESTIONS
+//====================================
+
+async function loadQuestions(){
+
+const {data,error}=await supabaseClient
+
+.from("disc_questions")
+
+.select("*")
+
+.order("question_no");
+
+if(error){
+
+alert(error.message);
+
+throw error;
+
+}
+
+APP.questions=data;
+
+log("✔ Total Soal : "+data.length);
+
+}
+
+//====================================
+// DISC MAPPING
+//====================================
+
+const DISC_MAP = {
+
+1:{
+P:{1:"S",2:"I",3:"*",4:"C"},
+K:{1:"S",2:"I",3:"D",4:"C"}
+},
+
+2:{
+P:{1:"C",2:"D",3:"*",4:"S"},
+K:{1:"*",2:"D",3:"I",4:"S"}
+},
+
+3:{
+P:{1:"I",2:"*",3:"*",4:"D"},
+K:{1:"I",2:"C",3:"S",4:"*"}
+},
+
+4:{
+P:{1:"C",2:"S",3:"*",4:"D"},
+K:{1:"C",2:"S",3:"I",4:"D"}
+},
+
+5:{
+P:{1:"I",2:"D",3:"S",4:"*"},
+K:{1:"*",2:"D",3:"S",4:"C"}
+},
+
+6:{
+P:{1:"C",2:"D",3:"I",4:"S"},
+K:{1:"*",2:"D",3:"I",4:"S"}
+},
+
+7:{
+P:{1:"S",2:"I",3:"*",4:"*"},
+K:{1:"*",2:"I",3:"C",4:"D"}
+},
+
+8:{
+P:{1:"I",2:"S",3:"C",4:"D"},
+K:{1:"I",2:"S",3:"C",4:"D"}
+},
+
+9:{
+P:{1:"D",2:"C",3:"*",4:"*"},
+K:{1:"D",2:"C",3:"I",4:"S"}
+},
+
+10:{
+P:{1:"*",2:"D",3:"S",4:"I"},
+K:{1:"C",2:"D",3:"S",4:"*"}
+},
+
+11:{
+P:{1:"S",2:"*",3:"D",4:"C"},
+K:{1:"*",2:"I",3:"D",4:"C"}
+},
+
+12:{
+P:{1:"*",2:"C",3:"I",4:"D"},
+K:{1:"S",2:"*",3:"I",4:"D"}
+},
+
+13:{
+P:{1:"D",2:"S",3:"I",4:"*"},
+K:{1:"D",2:"*",3:"*",4:"C"}
+},
+
+14:{
+P:{1:"C",2:"I",3:"S",4:"D"},
+K:{1:"C",2:"I",3:"*",4:"D"}
+},
+
+15:{
+P:{1:"S",2:"C",3:"I",4:"D"},
+K:{1:"S",2:"*",3:"I",4:"D"}
+},
+
+16:{
+P:{1:"*",2:"C",3:"I",4:"S"},
+K:{1:"D",2:"*",3:"I",4:"S"}
+},
+
+17:{
+P:{1:"*",2:"D",3:"S",4:"I"},
+K:{1:"C",2:"D",3:"S",4:"*"}
+},
+
+18:{
+P:{1:"D",2:"*",3:"*",4:"C"},
+K:{1:"D",2:"I",3:"S",4:"*"}
+},
+
+19:{
+P:{1:"D",2:"S",3:"I",4:"*"},
+K:{1:"D",2:"*",3:"I",4:"C"}
+},
+
+20:{
+P:{1:"D",2:"S",3:"I",4:"C"},
+K:{1:"*",2:"S",3:"I",4:"*"}
+},
+
+21:{
+P:{1:"S",2:"D",3:"I",4:"*"},
+K:{1:"S",2:"D",3:"I",4:"C"}
+},
+
+22:{
+P:{1:"S",2:"*",3:"D",4:"C"},
+K:{1:"S",2:"I",3:"D",4:"C"}
+},
+
+23:{
+P:{1:"*",2:"I",3:"S",4:"*"},
+K:{1:"D",2:"*",3:"S",4:"C"}
+},
+
+24:{
+P:{1:"*",2:"I",3:"D",4:"C"},
+K:{1:"S",2:"I",3:"*",4:"*"}
+}
+  
+//====================================
+// CALCULATE DISC
+//====================================
+
+function countValue(arr,val){
+    return arr.filter(x=>x===val).length;
+}
+
+function calculateDISC(){
+
+    log("✔ Memulai DISC Engine");
+
+    const convert={
+        A:1,
+        B:2,
+        C:3,
+        D:4
+    };
+
+    APP.mostArray=[];
+    APP.leastArray=[];
+
+    for(const item of APP.answers){
+
+        const map=DISC_MAP[item.question_no];
+
+        const most=
+            map.P[
+                convert[item.most_answer]
+            ];
+
+        const least=
+            map.K[
+                convert[item.least_answer]
+            ];
+
+        APP.mostArray.push(most);
+        APP.leastArray.push(least);
+
+        log(
+            "Soal "+
+            item.question_no+
+            " → Most : "+
+            most+
+            " | Least : "+
+            least
+        );
+
+    }
+
+    APP.result={
+
+        most_d:countValue(APP.mostArray,"D"),
+        most_i:countValue(APP.mostArray,"I"),
+        most_s:countValue(APP.mostArray,"S"),
+        most_c:countValue(APP.mostArray,"C"),
+
+        least_d:countValue(APP.leastArray,"D"),
+        least_i:countValue(APP.leastArray,"I"),
+        least_s:countValue(APP.leastArray,"S"),
+        least_c:countValue(APP.leastArray,"C")
+
+    };
+
+    APP.result.most_star=
+        24-
+        (
+            APP.result.most_d+
+            APP.result.most_i+
+            APP.result.most_s+
+            APP.result.most_c
+        );
+
+    APP.result.least_star=
+        24-
+        (
+            APP.result.least_d+
+            APP.result.least_i+
+            APP.result.least_s+
+            APP.result.least_c
+        );
+
+    APP.result.change_d=
+        APP.result.most_d-
+        APP.result.least_d;
+
+    APP.result.change_i=
+        APP.result.most_i-
+        APP.result.least_i;
+
+    APP.result.change_s=
+        APP.result.most_s-
+        APP.result.least_s;
+
+    APP.result.change_c=
+        APP.result.most_c-
+        APP.result.least_c;
+
+    console.table(APP.result);
+
+    log("<span class='ok'>✔ Perhitungan Most / Least selesai</span>");
+
+}
+

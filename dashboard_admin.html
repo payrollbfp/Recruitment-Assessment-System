@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HR Recruitment System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL="https://nwrbjbwjmkahjuuyizfq.supabase.co";
+
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cmJqYndqbWthaGp1dXlpemZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjM4OTIsImV4cCI6MjA5MjQ5OTg5Mn0.n67pONlkoMqZguyoTwQQFJ0VBRfPaIVuVlPGxsajaGA";
+
+const supabaseClient=
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+</script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Tahoma,sans-serif;
+}
+
+body{
+background:#F4F7FC;
+overflow:hidden;
+}
+
+/*==========================
+HEADER
+==========================*/
+
+.header{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+right:0;
+
+height:65px;
+
+background:#1E3A8A;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 25px;
+
+color:white;
+
+z-index:999;
+
+box-shadow:0 2px 10px rgba(0,0,0,.15);
+
+}
+
+.logo{
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+.userArea{
+
+display:flex;
+
+align-items:center;
+
+gap:20px;
+
+}
+
+.notification{
+
+font-size:20px;
+
+cursor:pointer;
+
+}
+
+.user{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+cursor:pointer;
+
+}
+
+.avatar{
+
+width:38px;
+
+height:38px;
+
+border-radius:50%;
+
+background:white;
+
+color:#1E3A8A;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-weight:bold;
+
+}
+
+/*==========================
+SIDEBAR
+==========================*/
+
+.sidebar{
+
+position:fixed;
+
+top:65px;
+
+left:0;
+
+bottom:0;
+
+width:250px;
+
+background:white;
+
+border-right:1px solid #E5E7EB;
+
+overflow:auto;
+
+transition:.3s;
+
+}
+
+.menuTitle{
+
+padding:18px 25px;
+
+font-size:12px;
+
+font-weight:bold;
+
+color:#9CA3AF;
+
+text-transform:uppercase;
+
+}
+
+.menu{
+
+list-style:none;
+
+}
+
+.menu li{
+
+padding:15px 25px;
+
+cursor:pointer;
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+transition:.25s;
+
+font-size:15px;
+
+color:#374151;
+
+}
+
+.menu li:hover{
+
+background:#EEF4FF;
+
+color:#1E3A8A;
+
+}
+
+.menu li.active{
+
+background:#DBEAFE;
+
+color:#1E3A8A;
+
+font-weight:bold;
+
+border-left:5px solid #2563EB;
+
+}
+
+/*==========================
+SUB MENU
+==========================*/
+
+.submenu{
+
+display:none;
+
+background:#F8FAFC;
+
+}
+
+.submenu li{
+
+padding-left:55px;
+
+font-size:14px;
+
+}
+
+.submenu.show{
+
+display:block;
+
+}
+
+/*==========================
+CONTENT
+==========================*/
+
+.content{
+
+position:fixed;
+
+left:250px;
+
+top:65px;
+
+right:0;
+
+bottom:0;
+
+overflow:auto;
+
+padding:30px;
+
+}
+
+.page{
+
+display:none;
+
+}
+
+.page.active{
+
+display:block;
+
+}
+
+.pageTitle{
+
+font-size:28px;
+
+font-weight:bold;
+
+margin-bottom:25px;
+
+color:#1F2937;
+
+}
+
+/*==========================
+CARD
+==========================*/
+
+.cardGrid{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+margin-bottom:25px;
+
+}
+
+.card{
+
+background:white;
+
+border-radius:12px;
+
+padding:25px;
+
+box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+}
+
+.cardTitle{
+
+font-size:14px;
+
+color:#6B7280;
+
+margin-bottom:10px;
+
+}
+
+.cardValue{
+
+font-size:34px;
+
+font-weight:bold;
+
+color:#1E3A8A;
+
+}
+
+/*==========================
+CONTENT BOX
+==========================*/
+
+.box{
+
+background:white;
+
+border-radius:12px;
+
+padding:25px;
+
+margin-bottom:25px;
+
+box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+}
+
+.boxTitle{
+
+font-size:18px;
+
+font-weight:bold;
+
+margin-bottom:20px;
+
+color:#1F2937;
+
+}
+
+/*==========================
+RESPONSIVE
+==========================*/
+
+@media(max-width:1200px){
+
+.cardGrid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.sidebar{
+
+left:-250px;
+
+}
+
+.content{
+
+left:0;
+
+}
+
+.cardGrid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ==========================
+HEADER
+=========================== -->
+
+<div class="header">
+
+<div class="logo">
+
+HR Recruitment System
+
+</div>
+
+<div class="userArea">
+
+<div class="notification">
+
+🔔
+
+</div>
+
+<div class="user">
+
+<div class="avatar">
+
+A
+
+</div>
+
+<div>
+
+Administrator
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ==========================
+SIDEBAR
+=========================== -->
+
+<div class="sidebar">
+
+<div class="menuTitle">
+
+MAIN MENU
+
+</div>
+
+<ul class="menu">
+
+<li class="active" onclick="showPage('dashboard',this)">
+🏠 Dashboard
+</li>
+
+<li onclick="showPage('event',this)">
+📅 Recruitment Event
+</li>
+
+<li onclick="showPage('candidate',this)">
+👥 Candidate
+</li>
+
+<li onclick="toggleAssessment()">
+📝 Assessment
+</li>
+
+<ul class="submenu" id="assessmentMenu">
+
+<li onclick="showPage('disc',this)">
+DISC
+</li>
+
+<li>
+PAPI
+</li>
+
+<li>
+Kraepelin
+</li>
+
+<li>
+Color Blind
+</li>
+
+</ul>
+
+<li>
+🎤 Interview
+</li>
+
+<li>
+📊 Report
+</li>
+
+<li>
+⚙ Setting
+</li>
+
+<li>
+🚪 Logout
+</li>
+
+</ul>
+
+</div>
+
+<!-- ==========================
+CONTENT
+=========================== -->
+
+<div class="content">
+
+<!-- DASHBOARD -->
+
+<div class="page active" id="dashboard">
+
+<h2 class="pageTitle">
+
+Dashboard
+
+</h2>
+
+<div class="cardGrid">
+
+<div class="card">
+
+<div class="cardTitle">
+
+Total Candidate
+
+</div>
+
+<div class="cardValue" id="totalCandidate">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+
+DISC Finished
+
+</div>
+
+<div class="cardValue" id="discFinished">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+
+Running Test
+
+</div>
+
+<div class="cardValue">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="cardTitle">
+
+Waiting
+
+</div>
+
+<div class="cardValue">
+
+0
+
+</div>
+
+</div>
+
+</div>
+
+<div class="box">
+
+<div class="boxTitle">
+
+Recruitment Activity
+
+</div>
+
+<div id="activity">
+
+Belum ada aktivitas.
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Recruitment -->
+
+<div class="page" id="event">
+
+<h2 class="pageTitle">
+
+Recruitment Event
+
+</h2>
+
+<div class="box">
+
+Modul sedang dikembangkan...
+
+</div>
+
+</div>
+
+<!-- Candidate -->
+
+<div class="page" id="candidate">
+
+<h2 class="pageTitle">
+
+Candidate
+
+</h2>
+
+<div class="box">
+
+Modul sedang dikembangkan...
+
+</div>
+
+</div>
+
+<!-- DISC -->
+
+<div class="page" id="disc">
+
+<h2 class="pageTitle">
+
+DISC Monitoring
+
+</h2>
+
+<div class="box">
+
+Modul DISC akan kita isi pada Part 2.
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/*======================================
+SUPABASE
+======================================*/
+
+const APP={
+
+candidateTotal:0,
+
+discFinished:0,
+
+runningTest:0,
+
+waiting:0
+
+};
+
+/*======================================
+START
+======================================*/
+
+document.addEventListener(
+
+"DOMContentLoaded",
+
+init
+
+);
+
+async function init(){
+
+await loadDashboard();
+
+}
+
+/*======================================
+SPA
+======================================*/
+
+function showPage(page,el){
+
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
+
+document
+.getElementById(page)
+.classList.add("active");
+
+document
+.querySelectorAll(".menu li")
+.forEach(m=>m.classList.remove("active"));
+
+if(el){
+
+el.classList.add("active");
+
+}
+
+}
+
+function toggleAssessment(){
+
+document
+.getElementById("assessmentMenu")
+.classList.toggle("show");
+
+}
+
+/*======================================
+LOAD DASHBOARD
+======================================*/
+
+async function loadDashboard(){
+
+await loadCandidateTotal();
+
+await loadDiscFinished();
+
+await loadRunning();
+
+await loadWaiting();
+
+}
+
+await loadWaiting();
+
+/*======================================
+DISC FINISHED
+======================================*/
+
+async function loadDiscFinished(){
+
+const {
+
+count,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
+.from("disc_results")
+
+.select("*",{
+
+count:"exact",
+
+head:true
+
+});
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+APP.discFinished=count;
+
+document.getElementById(
+
+"discFinished"
+
+).innerHTML=count;
+
+}
+
+/*======================================
+RUNNING TEST
+======================================*/
+
+async function loadRunning(){
+
+const {
+
+count,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
+.from("candidates")
+
+.select("*",{
+
+count:"exact",
+
+head:true
+
+})
+
+.eq(
+
+"assessment_status",
+
+"Running"
+
+);
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+APP.runningTest=count;
+
+document.querySelectorAll(
+
+".cardValue"
+
+)[2]
+
+.innerHTML=count;
+
+}
+
+/*======================================
+WAITING
+======================================*/
+
+async function loadWaiting(){
+
+const {
+
+count,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
+.from("candidates")
+
+.select("*",{
+
+count:"exact",
+
+head:true
+
+})
+
+.eq(
+
+"assessment_status",
+
+"Waiting"
+
+);
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+APP.waiting=count;
+
+document.querySelectorAll(
+
+".cardValue"
+
+)[3]
+
+.innerHTML=count;
+
+}
+
+</body>
+</html>
